@@ -5,6 +5,7 @@ const fs = require('fs');
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
+const groupRoutes = require('./routes/groups');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,6 +21,7 @@ app.use(express.json());
 
 // API routes
 app.use('/api/auth', authRoutes);
+app.use('/api/groups', groupRoutes);
 
 // Serve static files in production
 const clientDist = path.join(__dirname, '..', 'client', 'dist');
