@@ -1,13 +1,34 @@
 const express = require('express');
 const { nanoid } = require('nanoid');
 const { PrismaClient } = require('@prisma/client');
-const authenticate = require('../middleware/auth');
+const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 const prisma = new PrismaClient();
 
 // All group routes require authentication
-router.use(authenticate);
+router.use(authMiddleware);
+
+// GET /api/groups (groups current user belongs to)
+router.get('/', authMiddleware, async (req, res) => {
+  try {
+    const groups = await prisma.group.findMany({
+      where: {
+        members: {
+          some: {
+            userId: req.user.id,
+          },
+        },
+      },
+    });
+
+    // Return the array directly so the frontend can do groups.map(...)
+    res.json(groups);
+  } catch (err) {
+    console.error('List groups error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 // POST /api/groups — create a new group
 router.post('/', async (req, res) => {
