@@ -231,14 +231,14 @@ Messages
 
 ## MVP Implementation Priority
 
-### Phase 1: Core Functionality (Thursday)
+### Phase 1: Core Functionality
 1. ✅ User signup/login
 2. ✅ Create group + generate invite link
 3. ✅ Join group via invite link
 4. ✅ Basic shared notes (even just a textarea that saves)
 5. ✅ Doubt Dictionary: Post question + AI answer
 
-### Phase 2: Polish (Thursday Night/Friday Morning)
+### Phase 2: Polish
 6. ✅ Upvoting on questions/answers
 7. ✅ Human responses to questions
 8. ✅ AI note summarization
@@ -249,7 +249,6 @@ Messages
 11. ⭐ Real-time collaborative editing
 12. ⭐ Search in Doubt Dictionary
 13. ⭐ Syllabus deadline extraction
-14. ⭐ "Schedule hangout" prompts
 
 ---
 
