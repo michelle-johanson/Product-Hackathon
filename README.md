@@ -1,6 +1,13 @@
 # Product-Hackathon
 
-This repository contains a **Node.js + Express** backend and a **React (Vite)** frontend located in `client/`. The API is exposed at `/api/hello`, and the server serves the built React app from `client/dist`.
+## 🏗️ Tech Stack
+
+- **Frontend**: React + Vite (in `client/`)
+- **Backend**: Node.js + Express (in `server/`)
+- **Database**: PostgreSQL (hosted on Railway)
+- **ORM**: Prisma
+- **Auth**: JWT tokens
+
 
 ## 🚀 Getting Started
 
@@ -13,35 +20,30 @@ cd Product-Hackathon
 
 # Install Dependencies
 npm install
+
+# Setup .env file
+cp .env.example .env
+# Check with Michelle for Session Secrets
 ```
 
 ## 🏃 Running the App
 
-### Option A: Run in Development
-Features hot-reloading for instant feedback.
+### Development Mode (Recommended)
+Hot-reloading for both frontend and backend:
+
 ```bash
-# Start the API server and the React dev server
 npm run dev:all
 ```
-Open Browser: Go to http://localhost:5173. You can edit files in client/src and see changes instantly.
 
-### Option B: Run Locally
-Simulates how the app runs in a production environment.
+- Frontend: `http://localhost:5173` (Vite dev server)
+- Backend API: `http://localhost:3000/api/*`
 
+### Production Mode (For Testing)
 ```bash
-# Build the React app and start the server:
 npm run build
-npm run start
+npm start
 ```
-Open Browser: Go to http://localhost:3000.
-
-## 📂 Project Structure
-* `server.js` – Express server: serves `client/dist` (or `public/` if no build) and provides `/api/hello`.
-* `package.json` – Root scripts and dependencies.
-* `client/` – React + Vite app.
-	* `client/src/` – React components and styles.
-	* `client/dist/` – Built output (generated after npm run build).
-* `public/` – Legacy static frontend (used only if `client/dist` is missing).
+- Full app: `http://localhost:3000`
 
 
 ## 🐙 Git Workflow & Contribution
@@ -81,11 +83,18 @@ git pull origin main
 ```
 
 If you have any local changes that prevent you from pulling from the repo,
-
 you can wipe your local changes with:
 ```bash
 git restore .
 git pull origin main
+```
+
+
+**If you have conflicts:**
+```bash
+git stash              # Save your local changes
+git pull origin main
+git stash pop          # Reapply your changes
 ```
 
 Then create a new branch again for your next task:
@@ -100,3 +109,94 @@ git branch -d yourbranch
 git checkout -b yourbranch
 ```
 This keeps everyone’s code up-to-date and avoids merge conflicts.
+
+---
+
+## 🛠️ Common Commands
+
+```bash
+# Database
+npx prisma studio              # View database in browser
+npx prisma generate            # Regenerate Prisma Client after schema changes
+
+# Development
+npm run dev:all                # Start both frontend and backend
+npm run dev                    # Backend only
+cd client && npm run dev       # Frontend only
+
+# Production
+npm run build                  # Build frontend for production
+npm start                      # Start production server
+```
+
+## 🆘 Troubleshooting
+
+### "Prisma Client not found"
+```bash
+npx prisma generate
+```
+
+### "Port 3000 already in use"
+```bash
+# Kill the process using port 3000
+lsof -ti:3000 | xargs kill -9
+```
+
+### Backend changes not showing up
+- Make sure you're running `npm run dev:all` (not just `npm start`)
+- Restart the dev server
+
+---
+
+## 📁 Project Structure
+
+```
+Product-Hackathon/
+├── client/              # React frontend (Vite)
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   └── App.jsx
+│   └── dist/            # Built frontend (ignored in git)
+├── server/              # Express backend
+│   ├── routes/
+│   │   ├── auth.js      # Auth endpoints (/api/auth/*)
+│   │   └── groups.js    # Group endpoints (/api/groups/*)
+│   ├── middleware/
+│   │   └── auth.js      # JWT verification
+│   └── server.js        # Main server file
+├── prisma/
+│   └── schema.prisma    # Database schema
+├── .env                 # Environment variables (NOT in git)
+├── .env.example         # Template for .env
+└── package.json
+```
+
+
+## 🗄️ Database Schema
+
+We have 8 main tables:
+- **User** - User accounts
+- **Group** - Study groups
+- **GroupMember** - Group membership
+- **Note** - Shared notes per group
+- **Question** - Questions in Doubt Dictionary
+- **Answer** - Answers to questions (human + AI)
+- **Upvote** - Votes on questions/answers
+- **Message** - Group chat messages
+
+See `prisma/schema.prisma` for full details.
+
+
+## 🔑 API Endpoints (Current)
+
+### Authentication
+- `POST /api/auth/signup` - Create new user
+- `POST /api/auth/login` - Login (returns JWT)
+- `GET /api/auth/me` - Get current user (requires auth)
+
+### Groups (Work in Progress)
+- `POST /api/groups` - Create group
+- `POST /api/groups/join` - Join via invite code
+- `GET /api/groups/:id` - Get group details
+- More coming soon...
