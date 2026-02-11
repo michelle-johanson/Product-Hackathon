@@ -1,19 +1,29 @@
 const jwt = require('jsonwebtoken');
 
-function authenticate(req, res, next) {
-  const header = req.headers.authorization;
-  if (!header || !header.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Missing or invalid authorization header' });
+module.exports = (req, res, next) => {
+  // 1. Check for the Authorization header
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader) {
+    // Return 401 so the frontend knows to stop waiting and show the Login screen
+    return res.status(401).json({ error: 'Access denied. No token provided.' });
   }
 
-  const token = header.split(' ')[1];
+  // 2. Extract the token
+  const token = authHeader.split(' ')[1];
+  
+  if (!token) {
+    return res.status(401).json({ error: 'Access denied. Malformed token.' });
+  }
+
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { id: payload.userId, email: payload.email };
+    // 3. Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = { id: decoded.userId, email: decoded.email };
+    
+    // 4. CRITICAL: Allow the request to proceed
     next();
   } catch (err) {
-    return res.status(401).json({ error: 'Invalid or expired token' });
+    return res.status(401).json({ error: 'Invalid token.' });
   }
-}
-
-module.exports = authenticate;
+};
