@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
+  name         String
+  passwordHash String        @map("password_hash")
+  createdAt    DateTime      @default(now()) @map("created_at")
+
+  createdGroups Group[]       @relation("GroupCreator")
+  memberships   GroupMember[]
+  editedNotes   Note[]        @relation("NoteEditor")
+  questions     Question[]
+  answers       Answer[]
+  upvotes       Upvote[]
+  messages      Message[]
+
+  @@map("users")
+}
+
+model Group {
+  id          Int           @id @default(autoincrement())
+  name        String
+  className   String        @map("class_name")
+  description String?
+  inviteCode  String        @unique @map("invite_code")
+  createdBy   Int           @map("created_by")
+  createdAt   DateTime      @default(now()) @map("created_at")
+
+  creator     User          @relation("GroupCreator", fields: [createdBy], references: [id])
+  members     GroupMember[]
+  notes       Note[]
+  questions   Question[]
+  messages    Message[]
+
+  @@map("groups")
+}
+
+model GroupMember {
+  id       Int      @id @default(autoincrement())
+  groupId  Int      @map("group_id")
+  userId   Int      @map("user_id")
+  joinedAt DateTime @default(now()) @map("joined_at")
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@map("group_members")
+}
+
+model Note {
+  id           Int      @id @default(autoincrement())
+  groupId      Int      @map("group_id")
+  title        String
+  content      String   @default("")
+  lastEditedBy Int      @map("last_edited_by")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  group  Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  editor User  @relation("NoteEditor", fields: [lastEditedBy], references: [id])
+
+  @@map("notes")
+}
+
+model Question {
+  id          Int      @id @default(autoincrement())
+  groupId     Int      @map("group_id")
+  userId      Int?     @map("user_id")
+  isAnonymous Boolean  @default(false) @map("is_anonymous")
+  title       String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  upvoteCount Int      @default(0) @map("upvote_count")
+
+  group   Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user    User?    @relation(fields: [userId], references: [id])
+  answers Answer[]
+
+  @@map("questions")
+}
+
+model Answer {
+  id            Int      @id @default(autoincrement())
+  questionId    Int      @map("question_id")
+  userId        Int?     @map("user_id")
+  isAiGenerated Boolean  @default(false) @map("is_ai_generated")
+  content       String
+  createdAt     DateTime @default(now()) @map("created_at")
+  upvoteCount   Int      @default(0) @map("upvote_count")
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user     User?    @relation(fields: [userId], references: [id])
+
+  @@map("answers")
+}
+
+enum VotableType {
+  question
+  answer
+}
+
+model Upvote {
+  id         Int         @id @default(autoincrement())
+  userId     Int         @map("user_id")
+  votableType VotableType @map("votable_type")
+  votableId  Int         @map("votable_id")
+  createdAt  DateTime    @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, votableType, votableId])
+  @@map("upvotes")
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  groupId   Int      @map("group_id")
+  userId    Int      @map("user_id")
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@map("messages")
+}
