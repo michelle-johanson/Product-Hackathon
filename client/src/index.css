@@ -1,0 +1,39 @@
+/* Design tokens */
+:root {
+  --color-text: #0b1a2b;
+  --color-bg: #f6f8fa;
+  --color-surface: #ffffff;
+  --color-primary: #0366d6;
+  --color-error: #cb2431;
+  --shadow-card: 0 6px 18px rgba(11, 26, 43, 0.06);
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --transition-fast: 150ms ease;
+}
+
+/* Base */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: var(--space-xl);
+  font-family: var(--font-sans);
+  background: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -2,44 +2,59 @@
 
 ## Getting started
 
-This repository contains a minimal Node.js + Express skeleton that serves a static frontend from the `public/` folder and exposes a small example API at `/api/hello`.
+This repo has a **Node.js + Express** backend and a **React (Vite)** frontend in `client/`. The API is at `/api/hello`. The server serves the built React app from `client/dist` when present.
 
-Quick steps to run locally:
+### Run locally (production-style)
 
-1. Install dependencies:
+1. Install dependencies (root and client):
 
 ```bash
 npm install
+cd client && npm install && cd ..
 ```
 
-2. Start the server:
+2. Build the React app and start the server:
 
 ```bash
+npm run build
 npm run start
 ```
 
 3. Open http://localhost:3000 in your browser.
 
-For development with automatic restarts you can run:
+### Run in development (with hot reload)
+
+1. **Terminal 1** – start the API server:
 
 ```bash
 npm run dev
 ```
 
+2. **Terminal 2** – start the React dev server (proxies `/api` to the backend):
+
+```bash
+npm run dev:client
+```
+
+3. Open http://localhost:5173 in your browser. Edit files in `client/src` and see changes instantly.
+
 ## Project structure
 
-	- `server.js` - Express server that serves `public/` and provides API endpoints
-	- `package.json` - scripts and dependencies
-	- `public/` - static frontend files (HTML, JS, CSS)
-	- `.gitignore` - common ignores
+- `server.js` – Express server: serves `client/dist` (or `public/` if no build), provides `/api/hello`
+- `package.json` – root scripts and dependencies
+- `client/` – React + Vite app
+  - `client/src/` – React components, styles
+  - `client/dist/` – built output (after `npm run build`)
+- `public/` – legacy static frontend (used only if `client/dist` is missing)
 
-## Next steps
+## Scripts
 
-Suggestions you might want to add next:
-
-- Convert the frontend to a React/Vite app in `client/` or `frontend/`.
-- Add tests and CI.
-- Add linting (ESLint/Prettier) and TypeScript.
+| Script        | Description                                      |
+|---------------|--------------------------------------------------|
+| `npm run start`     | Run Express server (serve built React app)       |
+| `npm run dev`       | Run Express with nodemon                         |
+| `npm run build`     | Build React app into `client/dist`               |
+| `npm run dev:client`| Run Vite dev server (use with `npm run dev`)     |
 
 WE CAN DO THIS!!!
 YAY

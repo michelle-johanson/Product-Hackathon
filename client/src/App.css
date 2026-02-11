@@ -1,0 +1,44 @@
+.app {
+  max-width: 640px;
+  width: 100%;
+  margin: 0 auto;
+  background: var(--color-surface);
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.app h1 {
+  margin: 0 0 var(--space-md);
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.message {
+  margin: 0 0 var(--space-lg);
+  line-height: 1.5;
+}
+
+.message--error {
+  color: var(--color-error);
+}
+
+.btn-refresh {
+  padding: var(--space-sm) var(--space-md);
+  border: none;
+  background: var(--color-primary);
+  color: white;
+  font-family: inherit;
+  font-size: 1rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.btn-refresh:hover {
+  opacity: 0.9;
+}
+
+.btn-refresh:active {
+  transform: translateY(1px);
+}
