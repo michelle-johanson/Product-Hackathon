@@ -1,11 +1,19 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Serve static files from public
-app.use(express.static(path.join(__dirname, 'public')));
+const client_dist = path.join(__dirname, 'client', 'dist');
+const public_dir = path.join(__dirname, 'public');
+
+// Serve static files: prefer React build (client/dist), else legacy public/
+if (fs.existsSync(client_dist)) {
+  app.use(express.static(client_dist));
+} else {
+  app.use(express.static(public_dir));
+}
 
 // Example API endpoint
 app.get('/api/hello', (req, res) => {
@@ -14,7 +22,10 @@ app.get('/api/hello', (req, res) => {
 
 // Fallback to index.html for SPA-friendly routing
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  const index_path = fs.existsSync(client_dist)
+    ? path.join(client_dist, 'index.html')
+    : path.join(public_dir, 'index.html');
+  res.sendFile(index_path);
 });
 
 app.listen(PORT, () => {
