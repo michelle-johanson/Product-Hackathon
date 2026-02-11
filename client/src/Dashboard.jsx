@@ -1,135 +1,214 @@
-import { useEffect, useState } from "react";
-import { apiRequest } from "./lib/api";
+import { useState, useEffect } from 'react';
 
-export default function Dashboard({ user }) {
+export default function Dashboard({ user, onLogout }) {
+  const [view, setView] = useState('menu'); // 'menu' | 'add_group' | 'view_groups'
+  
   const [groups, setGroups] = useState([]);
-  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [loadingGroups, setLoadingGroups] = useState(false);
 
-  const [groupName, setGroupName] = useState("");
-  const [className, setClassName] = useState("");
-  const [inviteCode, setInviteCode] = useState("");
+  // CREATE Group State
+  const [groupName, setGroupName] = useState('');
+  const [className, setClassName] = useState('');
 
-  const loadGroups = async () => {
+  // JOIN Group State (NEW!)
+  const [joinCode, setJoinCode] = useState('');
+
+  // --- API CALLS ---
+
+  const fetchGroups = async () => {
+    setLoadingGroups(true);
+    const token = localStorage.getItem('token');
     try {
-      const data = await apiRequest("/groups");
+      const res = await fetch('http://localhost:3000/groups', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
       setGroups(data);
     } catch (err) {
-      console.error(err);
+      alert("Failed to load groups");
+    } finally {
+      setLoadingGroups(false);
     }
   };
 
+  const handleCreateGroup = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+
+    const res = await fetch('http://localhost:3000/groups', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ name: groupName, className })
+    });
+
+    if (res.ok) {
+      alert("Group Created Successfully!");
+      setView('view_groups'); // Send them to the list to see it
+      setGroupName('');
+      setClassName('');
+    } else {
+      alert("Failed to create group");
+    }
+  };
+
+  // NEW: Handle Joining
+  const handleJoinGroup = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+
+    const res = await fetch('http://localhost:3000/groups/join', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ inviteCode: joinCode })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("You joined the group!");
+      setView('view_groups'); // Send them to the list
+      setJoinCode('');
+    } else {
+      alert(data.error); // Show "Invalid Code" or "Already Joined"
+    }
+  };
+
+  // Load groups when view changes
   useEffect(() => {
-    loadGroups();
-  }, []);
-
-  const createGroup = async () => {
-    try {
-      await apiRequest("/groups", {
-        method: "POST",
-        body: JSON.stringify({ name: groupName, className }),
-      });
-
-      setGroupName("");
-      setClassName("");
-      loadGroups();
-    } catch (err) {
-      alert(err.message);
+    if (view === 'view_groups') {
+      fetchGroups();
     }
-  };
+  }, [view]);
 
-  const joinGroup = async () => {
-    try {
-      await apiRequest("/groups/join", {
-        method: "POST",
-        body: JSON.stringify({ inviteCode }),
-      });
 
-      setInviteCode("");
-      loadGroups();
-    } catch (err) {
-      alert(err.message);
-    }
-  };
+  // --- VIEWS ---
 
-  if (selectedGroup) {
+  // 1. MENU
+  if (view === 'menu') {
     return (
-      <GroupView
-        groupId={selectedGroup}
-        goBack={() => setSelectedGroup(null)}
-      />
+      <div style={{ padding: '50px', textAlign: 'center' }}>
+        <h1>Welcome, {user.name}!</h1>
+        
+        <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', marginTop: '40px' }}>
+          <button 
+            onClick={() => setView('add_group')}
+            style={{ padding: '20px 40px', fontSize: '18px', cursor: 'pointer' }}
+          >
+            + Add / Join Group
+          </button>
+
+          <button 
+            onClick={() => setView('view_groups')}
+            style={{ padding: '20px 40px', fontSize: '18px', cursor: 'pointer' }}
+          >
+            View My Groups
+          </button>
+        </div>
+
+        <br /><br />
+        <button onClick={onLogout} style={{ color: 'red' }}>Log Out</button>
+      </div>
     );
   }
 
-  return (
-    <div>
-      <h1>Welcome, {user.name}</h1>
-
-      <h2>Your Groups</h2>
-      {groups.length === 0 && <p>No groups yet.</p>}
-      {groups.map((g) => (
-        <div key={g.id}>
-          <button onClick={() => setSelectedGroup(g.id)}>
-            {g.name}
-          </button>
+  // 2. ADD / JOIN GROUP
+  if (view === 'add_group') {
+    return (
+      <div style={{ padding: '50px', maxWidth: '400px', margin: '0 auto' }}>
+        <button onClick={() => setView('menu')}>← Back to Menu</button>
+        
+        {/* CREATE FORM */}
+        <div style={{ marginBottom: '40px' }}>
+          <h2>Create a New Group</h2>
+          <form onSubmit={handleCreateGroup}>
+            <div style={{ marginBottom: '15px' }}>
+              <label>Group Name</label><br/>
+              <input 
+                style={{ width: '100%', padding: '8px' }}
+                value={groupName}
+                onChange={e => setGroupName(e.target.value)}
+                required
+              />
+            </div>
+            <div style={{ marginBottom: '15px' }}>
+              <label>Class Name</label><br/>
+              <input 
+                style={{ width: '100%', padding: '8px' }}
+                value={className}
+                onChange={e => setClassName(e.target.value)}
+                required
+              />
+            </div>
+            <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#4CAF50', color: 'white', border: 'none', cursor: 'pointer' }}>
+              Create Group
+            </button>
+          </form>
         </div>
-      ))}
 
-      <h2>Create Group</h2>
-      <input
-        placeholder="Group name"
-        value={groupName}
-        onChange={(e) => setGroupName(e.target.value)}
-      />
-      <input
-        placeholder="Class name"
-        value={className}
-        onChange={(e) => setClassName(e.target.value)}
-      />
-      <button onClick={createGroup}>Create</button>
+        <hr />
 
-      <h2>Join Group</h2>
-      <input
-        placeholder="Invite code"
-        value={inviteCode}
-        onChange={(e) => setInviteCode(e.target.value)}
-      />
-      <button onClick={joinGroup}>Join</button>
-    </div>
-  );
-}
-
-function GroupView({ groupId, goBack }) {
-  const [group, setGroup] = useState(null);
-
-  useEffect(() => {
-    const loadGroup = async () => {
-      try {
-        const data = await apiRequest(`/groups/${groupId}`);
-        setGroup(data);
-      } catch (err) {
-        alert("Failed to load group");
-      }
-    };
-
-    loadGroup();
-  }, [groupId]);
-
-  if (!group) return <div>Loading group...</div>;
-
-  return (
-    <div>
-      <button onClick={goBack}>← Back</button>
-
-      <h1>{group.name}</h1>
-      <p>Class: {group.className}</p>
-      <p>Invite Code: {group.inviteCode}</p>
-
-      <h2>Members</h2>
-      {group.members.map((m) => (
-        <div key={m.user.id}>
-          {m.user.name} ({m.user.email})
+        {/* JOIN FORM */}
+        <div style={{ marginTop: '40px' }}>
+          <h2>OR Join Existing Group</h2>
+          <form onSubmit={handleJoinGroup}>
+            <div style={{ marginBottom: '15px' }}>
+              <label>Enter Invite Code</label><br/>
+              <input 
+                style={{ width: '100%', padding: '8px' }}
+                placeholder="e.g. x7z9q2"
+                value={joinCode}
+                onChange={e => setJoinCode(e.target.value)}
+                required
+              />
+            </div>
+            <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#008CBA', color: 'white', border: 'none', cursor: 'pointer' }}>
+              Join Group
+            </button>
+          </form>
         </div>
-      ))}
-    </div>
-  );
+      </div>
+    );
+  }
+
+  // 3. VIEW GROUPS
+  if (view === 'view_groups') {
+    return (
+      <div style={{ padding: '50px', maxWidth: '600px', margin: '0 auto' }}>
+        <button onClick={() => setView('menu')}>← Back to Menu</button>
+        <h2>My Study Groups</h2>
+
+        {loadingGroups ? (
+          <p>Loading...</p>
+        ) : groups.length === 0 ? (
+          <p>You haven't joined any groups yet.</p>
+        ) : (
+          <div style={{ display: 'grid', gap: '15px' }}>
+            {groups.map(group => (
+              <div 
+                key={group.id}
+                style={{ 
+                  border: '1px solid #ccc', 
+                  padding: '15px', 
+                  borderRadius: '8px',
+                  backgroundColor: '#f9f9f9'
+                }}
+              >
+                <h3 style={{ margin: '0 0 5px 0' }}>{group.name}</h3>
+                <p style={{ margin: '0', color: '#666' }}>{group.className}</p>
+                <div style={{ marginTop: '10px', fontSize: '14px', color: '#888' }}>
+                  Members: {group._count.members} • Invite Code: <b style={{ background: '#eee', padding: '2px 5px' }}>{group.inviteCode}</b>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
 }

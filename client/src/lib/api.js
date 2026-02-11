@@ -1,4 +1,5 @@
-const API_BASE = "/api";
+// client/src/lib/api.js
+const API_BASE = "/api"; // Keep this relative!
 
 export async function apiRequest(endpoint, options = {}) {
   const token = localStorage.getItem("token");
