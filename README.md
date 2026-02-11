@@ -41,4 +41,4 @@ Suggestions you might want to add next:
 - Add tests and CI.
 - Add linting (ESLint/Prettier) and TypeScript.
 
-If you'd like, I can wire up any of the above next.
+WE CAN DO THIS!!!
