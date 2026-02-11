@@ -42,3 +42,4 @@ Suggestions you might want to add next:
 - Add linting (ESLint/Prettier) and TypeScript.
 
 WE CAN DO THIS!!!
+YAY
