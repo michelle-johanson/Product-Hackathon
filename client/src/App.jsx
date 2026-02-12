@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import GroupPage from './components/GroupPage';
 
 // --- Dashboard Component ---
 const Dashboard = ({ user, groups, refreshGroups }) => {
@@ -97,75 +98,6 @@ const Dashboard = ({ user, groups, refreshGroups }) => {
   }
 };
 
-// --- Group Page Component ---
-const GroupPage = ({ group, onBack }) => {
-  const [groupDetails, setGroupDetails] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!group || !group.id) return; 
-    const fetchGroupDetails = async () => {
-      setLoading(true);
-      const token = localStorage.getItem('token');
-      try {
-        const res = await fetch(`http://localhost:3000/api/groups/${group.id}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setGroupDetails(data);
-        }
-      } catch (err) {
-        console.error("Failed to fetch group details", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchGroupDetails();
-  }, [group?.id]);
-
-  if (!group) return <div style={{padding: '24px'}}>No group selected.</div>; 
-  if (loading) return <div style={{padding: '24px'}}>Loading group info...</div>;
-  if (!groupDetails) return <div style={{padding: '24px'}}>Failed to load group.</div>;
-
-  return (
-    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-      <button onClick={onBack} style={{ marginBottom: '20px', backgroundColor: 'transparent', color: '#3498db', border: '1px solid #3498db', padding: '8px 15px', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer' }}>
-        ← Back to Dashboard
-      </button>
-      
-      <div style={{ marginBottom: '20px', borderTop: '5px solid #3498db', background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
-        <h2 style={{ fontSize: '2rem', marginBottom: '5px', marginTop: 0 }}>{groupDetails.name}</h2>
-        <p style={{ color: '#666', fontSize: '1.1rem', marginBottom: '15px' }}>Class: {groupDetails.className}</p>
-        
-        <div style={{ background: '#f4f4f9', padding: '10px', borderRadius: '5px', display: 'inline-block' }}>
-          Share Invite Code: <strong style={{ letterSpacing: '2px', fontSize: '1.2rem' }}>{groupDetails.inviteCode}</strong>
-        </div>
-      </div>
-
-      <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
-        <h3 style={{ marginBottom: '15px', borderBottom: '1px solid #eee', paddingBottom: '10px', marginTop: 0 }}>
-          Team Members ({groupDetails.members?.length || 0})
-        </h3>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {groupDetails.members?.map((member) => (
-            <div key={member.id} style={{ display: 'flex', alignItems: 'center', gap: '15px', padding: '10px', background: '#f9f9fc', borderRadius: '5px' }}>
-              <div style={{ width: '40px', height: '40px', background: '#2c3e50', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
-                {member.user?.name?.charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <div style={{ fontWeight: 'bold' }}>{member.user?.name}</div>
-                <div style={{ fontSize: '0.9rem', color: '#7f8c8d' }}>{member.user?.email}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
-
 // --- Layout Component ---
 const Layout = ({ children, user, onLogout, groups, currentGroup, onSelectGroup }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -224,10 +156,11 @@ const Layout = ({ children, user, onLogout, groups, currentGroup, onSelectGroup 
 export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  
+  const [socket, setSocket] = useState(null);
+
   // App State
   const [isSignup, setIsSignup] = useState(false);
-  const [groups, setGroups] = useState([]); 
+  const [groups, setGroups] = useState([]);
   const [currentGroup, setCurrentGroup] = useState(null); 
 
   // Form State
@@ -256,13 +189,28 @@ export default function App() {
   useEffect(() => {
     if (!user) return;
     try {
-      const socket = new WebSocket('ws://localhost:3000');
+      const token = localStorage.getItem('token');
+      const socket = new WebSocket(`ws://localhost:3000?token=${token}`);
+
       socket.onopen = () => {
         console.log('✅ Connected to WebSocket!');
-        socket.send(`Hello from React! ${user.name} just logged in.`);
+        setSocket(socket);
       };
-      socket.onmessage = (event) => console.log('📩 Message from Server:', event.data);
-      return () => socket.close();
+
+      socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+
+      socket.onclose = () => {
+        console.log('WebSocket closed');
+        setSocket(null);
+      };
+
+      return () => {
+        if (socket.readyState === 1) {
+          socket.close();
+        }
+      };
     } catch (e) {
       console.warn('Could not establish WebSocket connection.');
     }
@@ -325,23 +273,25 @@ export default function App() {
 
   if (user) {
     return (
-      <Layout 
-        user={user} 
+      <Layout
+        user={user}
         onLogout={handleLogout}
         groups={groups}
         currentGroup={currentGroup}
         onSelectGroup={setCurrentGroup}
       >
         {currentGroup ? (
-          <GroupPage 
-            group={currentGroup} 
-            onBack={() => setCurrentGroup(null)} 
+          <GroupPage
+            group={currentGroup}
+            onBack={() => setCurrentGroup(null)}
+            socket={socket}
+            user={user}
           />
         ) : (
-          <Dashboard 
-            user={user} 
-            groups={groups} 
-            refreshGroups={fetchGroups} 
+          <Dashboard
+            user={user}
+            groups={groups}
+            refreshGroups={fetchGroups}
           />
         )}
       </Layout>
