@@ -21,6 +21,7 @@ model User {
   answers       Answer[]
   upvotes       Upvote[]
   messages      Message[]
+  files         File[]
 
   @@map("users")
 }
@@ -39,6 +40,7 @@ model Group {
   notes       Note[]
   questions   Question[]
   messages    Message[]
+  files       File[]
 
   @@map("groups")
 }
@@ -132,4 +134,19 @@ model Message {
   user  User  @relation(fields: [userId], references: [id])
 
   @@map("messages")
+}
+
+model File {
+  id         Int      @id @default(autoincrement())
+  name       String
+  url        String
+  type       String   // "PDF" or "MD"
+  groupId    Int      @map("group_id")
+  uploadedBy Int      @map("uploaded_by")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [uploadedBy], references: [id])
+
+  @@map("files")
 }
