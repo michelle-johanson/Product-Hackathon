@@ -13,7 +13,7 @@ router.get('/:groupId', authMiddleware, async (req, res) => {
     });
     if (!note) {
       note = await prisma.note.create({
-        data: { groupId: parseInt(groupId), content: '' }
+        data: { groupId: parseInt(groupId), title: 'Shared Notes', content: '', lastEditedBy: req.user.id }
       });
     }
     res.json(note);
@@ -32,7 +32,7 @@ router.post('/:groupId', authMiddleware, async (req, res) => {
     const note = await prisma.note.upsert({
       where: { groupId: parseInt(groupId) },
       update: { content, lastEditedBy: userId },
-      create: { groupId: parseInt(groupId), content, lastEditedBy: userId }
+      create: { groupId: parseInt(groupId), title: 'Shared Notes', content, lastEditedBy: userId }
     });
     res.json(note);
   } catch (err) {
