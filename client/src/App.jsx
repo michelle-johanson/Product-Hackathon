@@ -141,7 +141,7 @@ const Layout = ({ children, user, onLogout, groups, currentGroup, onSelectGroup 
           </div>
         </header>
 
-        <main className="layout-content">
+        <main className="layout-content" style={{ padding: 0, margin: 0 }}>
           {children}
         </main>
       </div>

@@ -97,9 +97,9 @@ export default function GroupPage({ group, onBack, socket, user, refreshGroups }
   if (!groupDetails) return <div className="p-6">Failed to load group.</div>;
 
   return (
-    <div className="group-page-container">
+    <div className="group-page-container" style={{ width: '100%', height: '100%', padding: 0, margin: 0 }}>
       {/* Center Content Area */}
-      <div className="center-content">
+      <div className="center-content" style={{ padding: '20px' }}>
         <div className="card group-header-card">
           {isEditing ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
