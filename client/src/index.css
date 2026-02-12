@@ -6,6 +6,12 @@
 }
 
 body {
+
+/* Ensure viewport locks to app and body doesn't scroll */
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background-color: #f4f4f9;
   color: #333;
@@ -171,6 +177,7 @@ input {
 /* 6. TRIPLE-PANE LAYOUT */
 .center-content {
   flex-grow: 1;
+  height: 100%;
   overflow-y: auto;
   padding: 30px;
 }
@@ -178,6 +185,7 @@ input {
 .right-panel {
   width: 350px;
   border-left: 1px solid #ddd;
+  height: 100%;
   overflow-y: auto;
   background: white;
   display: flex;

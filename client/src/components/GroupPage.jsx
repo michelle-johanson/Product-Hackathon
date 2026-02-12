@@ -6,7 +6,7 @@ import AiChatComponent from './AiChatComponent';
 export default function GroupPage({ group, onBack, socket, user }) {
   const [groupDetails, setGroupDetails] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentTab, setCurrentTab] = useState('members');
+  const [currentTab, setCurrentTab] = useState('classinfo');
   const [chatMode, setChatMode] = useState('group'); // 'group' or 'ai'
 
   useEffect(() => {
@@ -62,31 +62,27 @@ export default function GroupPage({ group, onBack, socket, user }) {
   });
 
   return (
-    <div style={{ display: 'flex', height: 'calc(100vh - 65px)' }}>
+    <div style={{ display: 'flex', height: '100%' }}>
       {/* Center Content Area */}
       <div className="center-content">
-        <button onClick={onBack} className="btn-secondary" style={{ marginBottom: '20px' }}>
-          ← Back to Dashboard
-        </button>
-
         <div className="card" style={{ marginBottom: '20px', borderTop: '5px solid #3498db' }}>
           <h2 style={{ fontSize: '2rem', marginBottom: '5px' }}>{groupDetails.name}</h2>
           <p style={{ color: '#666', fontSize: '1.1rem', marginBottom: '15px' }}>Class: {groupDetails.className}</p>
-          <div style={{ background: '#f4f4f9', padding: '10px', borderRadius: '5px', display: 'inline-block' }}>
-            Share Invite Code: <strong style={{ letterSpacing: '2px', fontSize: '1.2rem' }}>{groupDetails.inviteCode}</strong>
-          </div>
         </div>
 
         {/* Tab Navigation - Members and Notes only */}
         <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', borderBottom: '2px solid #eee' }}>
-          <button onClick={() => setCurrentTab('members')} style={tabStyle('members')}>Members</button>
+          <button onClick={() => setCurrentTab('classinfo')} style={tabStyle('classinfo')}>Class Info</button>
           <button onClick={() => setCurrentTab('notes')} style={tabStyle('notes')}>Notes</button>
         </div>
 
         {/* Tab Content */}
-        {currentTab === 'members' && (
+        {currentTab === 'classinfo' && (
           <div className="card">
-            <h3 style={{ marginBottom: '15px' }}>Team Members ({groupDetails.members?.length || 0})</h3>
+            <h3 style={{ marginBottom: '10px' }}>Members ({groupDetails.members?.length || 0})</h3>
+            <div style={{ background: '#f4f4f9', padding: '10px', borderRadius: '5px', display: 'inline-block', marginBottom: '15px' }}>
+              Invite Code: <strong style={{ letterSpacing: '2px', fontSize: '1.1rem' }}>{groupDetails.inviteCode}</strong>
+            </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {groupDetails.members?.map((member) => (
                 <div key={member.id} style={{ display: 'flex', alignItems: 'center', gap: '15px', padding: '10px', background: '#f9f9fc', borderRadius: '5px' }}>

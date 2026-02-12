@@ -53,7 +53,7 @@ export default function Layout({ children, user, onLogout, groups, currentGroup,
       {/* RIGHT MAIN CONTENT */}
       <div className="main-content">
         <header className="top-header">
-          <h2>{currentGroup ? currentGroup.name : `Welcome, ${user.name}`}</h2>
+          <h2>{`Welcome, ${user.name}`}</h2>
           <div style={{ 
             width: '35px', height: '35px', 
             background: '#3498db', color: 'white', 

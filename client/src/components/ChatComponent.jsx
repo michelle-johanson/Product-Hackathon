@@ -144,7 +144,7 @@ export default function ChatComponent({ groupId, socket, user }) {
   };
 
   return (
-    <div className="chat-component" style={{ display: 'flex', flexDirection: 'column', height: '600px', background: '#fff', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+    <div className="chat-component" style={{ display: 'flex', flexDirection: 'column', height: '100%', background: '#fff', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
       {/* Header */}
       <div style={{ padding: '15px', borderBottom: '1px solid #eee', background: '#f9f9fc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h3 style={{ margin: '0', fontSize: '1rem' }}>Group Chat</h3>

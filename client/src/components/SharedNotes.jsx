@@ -81,7 +81,7 @@ export default function SharedNotes({ groupId, socket }) {
   if (loading) return <div>Loading notes...</div>;
 
   return (
-    <div className="card">
+    <div className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
         <h3 style={{ margin: 0 }}>📝 Shared Study Notes</h3>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
@@ -111,7 +111,8 @@ export default function SharedNotes({ groupId, socket }) {
         placeholder="Start typing your group notes here..."
         style={{ 
           width: '100%', 
-          height: '400px', 
+          flex: 1,
+          minHeight: '200px',
           padding: '15px', 
           borderRadius: '8px', 
           border: '1px solid #ddd', 

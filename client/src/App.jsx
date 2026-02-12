@@ -144,7 +144,7 @@ const Layout = ({ children, user, onLogout, groups, currentGroup, onSelectGroup 
           </div>
         </header>
 
-        <main style={{ flex: 1, padding: '30px', overflowY: 'auto', color: '#333' }}>
+        <main style={{ flex: 1, padding: '30px', overflow: 'hidden', color: '#333' }}>
           {children}
         </main>
       </div>
