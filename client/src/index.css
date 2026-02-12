@@ -167,3 +167,19 @@ input {
 .btn-secondary:hover {
   background-color: #ebf5fb;
 }
+
+/* 6. TRIPLE-PANE LAYOUT */
+.center-content {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 30px;
+}
+
+.right-panel {
+  width: 350px;
+  border-left: 1px solid #ddd;
+  overflow-y: auto;
+  background: white;
+  display: flex;
+  flex-direction: column;
+}
