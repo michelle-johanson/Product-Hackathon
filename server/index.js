@@ -87,11 +87,12 @@ wss.on('connection', (ws, req) => {
         const { groupId, content } = msg;
         
         // 1. Persist to DB immediately
-        await prisma.note.upsert({
-          where: { groupId: parseInt(groupId) },
-          update: { content: content, lastEditedBy: userId },
-          create: { groupId: parseInt(groupId), title: 'Shared Notes', content: content, lastEditedBy: userId }
-        });
+        const existing = await prisma.note.findFirst({ where: { groupId: parseInt(groupId) } });
+        if (existing) {
+          await prisma.note.update({ where: { id: existing.id }, data: { content, lastEditedBy: userId } });
+        } else {
+          await prisma.note.create({ data: { groupId: parseInt(groupId), title: 'Shared Notes', content, lastEditedBy: userId } });
+        }
 
         // 2. Broadcast to other members in the room
         const groupRoom = groupRooms.get(parseInt(groupId));
