@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function Layout({ children, user, onLogout }) {
+export default function Layout({ children, user, onLogout, groups, currentGroup, onSelectGroup }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
@@ -18,9 +18,30 @@ export default function Layout({ children, user, onLogout }) {
           </button>
         </div>
 
-        {/* Navigation Placeholder */}
-        <nav style={{ flex: 1 }}>
-          {/* Links go here */}
+        <nav style={{ flex: 1, overflowY: 'auto' }}>
+          <div 
+            className={`sidebar-link ${!currentGroup ? 'active' : ''}`} 
+            onClick={() => onSelectGroup(null)}
+          >
+            {sidebarOpen ? '🏠 Dashboard' : '🏠'}
+          </div>
+
+          {sidebarOpen && (
+            <div style={{ margin: '25px 0 10px 10px', fontSize: '0.75rem', color: '#888', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              My Groups
+            </div>
+          )}
+
+          {groups.map(g => (
+            <div
+              key={g.id}
+              className={`sidebar-link ${currentGroup?.id === g.id ? 'active' : ''}`}
+              onClick={() => onSelectGroup(g)}
+              title={g.name}
+            >
+              {sidebarOpen ? `📚 ${g.name}` : '📚'}
+            </div>
+          ))}
         </nav>
 
         <button onClick={onLogout} className="logout-btn">
@@ -32,7 +53,7 @@ export default function Layout({ children, user, onLogout }) {
       {/* RIGHT MAIN CONTENT */}
       <div className="main-content">
         <header className="top-header">
-          <h2>Welcome, {user.name}</h2>
+          <h2>{currentGroup ? currentGroup.name : `Welcome, ${user.name}`}</h2>
           <div style={{ 
             width: '35px', height: '35px', 
             background: '#3498db', color: 'white', 

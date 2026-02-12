@@ -1,13 +1,234 @@
-import { useState, useEffect } from 'react';
-import Dashboard from './components/Dashboard'; 
-import Layout from './Layout';
+import React, { useState, useEffect } from 'react';
 
+// --- Dashboard Component ---
+const Dashboard = ({ user, groups, refreshGroups }) => {
+  const [view, setView] = useState('menu'); 
+  const [groupName, setGroupName] = useState('');
+  const [className, setClassName] = useState('');
+  const [joinCode, setJoinCode] = useState('');
+
+  const handleCreateGroup = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch('http://localhost:3000/api/groups', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ name: groupName, className })
+      });
+      if (res.ok) {
+        refreshGroups();
+        setView('menu'); 
+        setGroupName('');
+        setClassName('');
+      }
+    } catch (err) {
+      console.error("Error creating group:", err);
+    }
+  };
+
+  const handleJoinGroup = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch('http://localhost:3000/api/groups/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ inviteCode: joinCode })
+      });
+      if (res.ok) {
+        refreshGroups();
+        setView('menu'); 
+        setJoinCode('');
+      }
+    } catch (err) {
+      console.error("Error joining group:", err);
+    }
+  };
+
+  if (view === 'menu') {
+    return (
+      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '24px' }}>Dashboard Overview</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+          <button 
+            onClick={() => setView('add_group')}
+            style={{ padding: '32px', border: '2px dashed #ccc', borderRadius: '12px', background: 'transparent', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}
+          >
+            <span style={{ fontSize: '2rem' }}>+</span>
+            <span style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>Create or Join a Group</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (view === 'add_group') {
+    return (
+      <div style={{ padding: '20px', maxWidth: '400px', margin: '0 auto', background: 'white', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
+        <button onClick={() => setView('menu')} style={{ background: 'none', border: 'none', color: '#3498db', cursor: 'pointer', marginBottom: '20px', padding: 0 }}>← Back</button>
+        <div style={{ marginBottom: '40px' }}>
+          <h2 style={{marginTop: 0}}>Create a New Group</h2>
+          <form onSubmit={handleCreateGroup}>
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{display: 'block', marginBottom: '5px'}}>Group Name</label>
+              <input style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', boxSizing: 'border-box' }} value={groupName} onChange={e => setGroupName(e.target.value)} required />
+            </div>
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{display: 'block', marginBottom: '5px'}}>Class Name</label>
+              <input style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', boxSizing: 'border-box' }} value={className} onChange={e => setClassName(e.target.value)} required />
+            </div>
+            <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#3498db', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', width: '100%' }}>Create Group</button>
+          </form>
+        </div>
+        <hr style={{border: 'none', borderTop: '1px solid #eee'}} />
+        <div style={{ marginTop: '30px' }}>
+          <h2>OR Join Existing Group</h2>
+          <form onSubmit={handleJoinGroup}>
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{display: 'block', marginBottom: '5px'}}>Enter Invite Code</label>
+              <input style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', boxSizing: 'border-box' }} placeholder="e.g. x7z9q2" value={joinCode} onChange={e => setJoinCode(e.target.value)} required />
+            </div>
+            <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#2ecc71', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', width: '100%' }}>Join Group</button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+};
+
+// --- Group Page Component ---
+const GroupPage = ({ group, onBack }) => {
+  const [groupDetails, setGroupDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!group || !group.id) return; 
+    const fetchGroupDetails = async () => {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      try {
+        const res = await fetch(`http://localhost:3000/api/groups/${group.id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setGroupDetails(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch group details", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchGroupDetails();
+  }, [group?.id]);
+
+  if (!group) return <div style={{padding: '24px'}}>No group selected.</div>; 
+  if (loading) return <div style={{padding: '24px'}}>Loading group info...</div>;
+  if (!groupDetails) return <div style={{padding: '24px'}}>Failed to load group.</div>;
+
+  return (
+    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+      <button onClick={onBack} style={{ marginBottom: '20px', backgroundColor: 'transparent', color: '#3498db', border: '1px solid #3498db', padding: '8px 15px', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer' }}>
+        ← Back to Dashboard
+      </button>
+      
+      <div style={{ marginBottom: '20px', borderTop: '5px solid #3498db', background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
+        <h2 style={{ fontSize: '2rem', marginBottom: '5px', marginTop: 0 }}>{groupDetails.name}</h2>
+        <p style={{ color: '#666', fontSize: '1.1rem', marginBottom: '15px' }}>Class: {groupDetails.className}</p>
+        
+        <div style={{ background: '#f4f4f9', padding: '10px', borderRadius: '5px', display: 'inline-block' }}>
+          Share Invite Code: <strong style={{ letterSpacing: '2px', fontSize: '1.2rem' }}>{groupDetails.inviteCode}</strong>
+        </div>
+      </div>
+
+      <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
+        <h3 style={{ marginBottom: '15px', borderBottom: '1px solid #eee', paddingBottom: '10px', marginTop: 0 }}>
+          Team Members ({groupDetails.members?.length || 0})
+        </h3>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {groupDetails.members?.map((member) => (
+            <div key={member.id} style={{ display: 'flex', alignItems: 'center', gap: '15px', padding: '10px', background: '#f9f9fc', borderRadius: '5px' }}>
+              <div style={{ width: '40px', height: '40px', background: '#2c3e50', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                {member.user?.name?.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <div style={{ fontWeight: 'bold' }}>{member.user?.name}</div>
+                <div style={{ fontSize: '0.9rem', color: '#7f8c8d' }}>{member.user?.email}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- Layout Component ---
+const Layout = ({ children, user, onLogout, groups, currentGroup, onSelectGroup }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  return (
+    <div style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', backgroundColor: '#f4f4f9', fontFamily: 'sans-serif' }}>
+      <aside style={{ width: sidebarOpen ? '250px' : '60px', backgroundColor: '#2c3e50', color: 'white', display: 'flex', flexDirection: 'column', padding: '20px', transition: 'width 0.3s ease' }}>
+        <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {sidebarOpen && <span>StudyApp</span>}
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} style={{ background: 'none', border: '1px solid #555', color: 'white', cursor: 'pointer', padding: '2px 8px', borderRadius: '4px' }}>
+            {sidebarOpen ? '←' : '→'}
+          </button>
+        </div>
+
+        <nav style={{ flex: 1, overflowY: 'auto' }}>
+          <div onClick={() => onSelectGroup(null)} style={{ padding: '12px 15px', marginBottom: '5px', borderRadius: '6px', cursor: 'pointer', color: !currentGroup ? 'white' : '#bdc3c7', backgroundColor: !currentGroup ? '#3498db' : 'transparent', display: 'flex', gap: '10px', fontWeight: !currentGroup ? 'bold' : 'normal', transition: 'all 0.2s ease' }}>
+            {sidebarOpen ? '🏠 Dashboard' : '🏠'}
+          </div>
+
+          {sidebarOpen && (
+            <div style={{ margin: '25px 0 10px 10px', fontSize: '0.75rem', color: '#888', textTransform: 'uppercase', letterSpacing: '1px' }}>
+              My Groups
+            </div>
+          )}
+
+          {groups.map(g => (
+            <div key={g.id} onClick={() => onSelectGroup(g)} title={g.name} style={{ padding: '12px 15px', marginBottom: '5px', borderRadius: '6px', cursor: 'pointer', color: currentGroup?.id === g.id ? 'white' : '#bdc3c7', backgroundColor: currentGroup?.id === g.id ? '#3498db' : 'transparent', display: 'flex', gap: '10px', fontWeight: currentGroup?.id === g.id ? 'bold' : 'normal', transition: 'all 0.2s ease', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {sidebarOpen ? `📚 ${g.name}` : '📚'}
+            </div>
+          ))}
+        </nav>
+
+        <button onClick={onLogout} style={{ marginTop: 'auto', background: 'none', border: 'none', color: '#ff6b6b', cursor: 'pointer', fontSize: '1rem', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span>🚪</span>
+          {sidebarOpen && <span>Log Out</span>}
+        </button>
+      </aside>
+
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <header style={{ background: 'white', padding: '15px 30px', borderBottom: '1px solid #ddd', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+          <h2 style={{ margin: 0, fontSize: '1.5rem', color: '#333' }}>{currentGroup ? currentGroup.name : `Welcome, ${user.name}`}</h2>
+          <div style={{ width: '35px', height: '35px', background: '#3498db', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+            {user.name.charAt(0).toUpperCase()}
+          </div>
+        </header>
+
+        <main style={{ flex: 1, padding: '30px', overflowY: 'auto', color: '#333' }}>
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+};
+
+// --- Main App Component ---
 export default function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   
-  // UI State
-  const [isSignup, setIsSignup] = useState(false); // Toggle between Login and Signup
+  // App State
+  const [isSignup, setIsSignup] = useState(false);
+  const [groups, setGroups] = useState([]); 
+  const [currentGroup, setCurrentGroup] = useState(null); 
 
   // Form State
   const [name, setName] = useState('');
@@ -19,7 +240,6 @@ export default function App() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      // UPDATED URL: /api/auth/me
       fetch('http://localhost:3000/api/auth/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
@@ -32,16 +252,48 @@ export default function App() {
     }
   }, []);
 
-  // 2. Handle Form Submit
+  // 2. WebSocket Connection
+  useEffect(() => {
+    if (!user) return;
+    try {
+      const socket = new WebSocket('ws://localhost:3000');
+      socket.onopen = () => {
+        console.log('✅ Connected to WebSocket!');
+        socket.send(`Hello from React! ${user.name} just logged in.`);
+      };
+      socket.onmessage = (event) => console.log('📩 Message from Server:', event.data);
+      return () => socket.close();
+    } catch (e) {
+      console.warn('Could not establish WebSocket connection.');
+    }
+  }, [user]);
+
+  // 3. Fetch Groups
+  const fetchGroups = async () => {
+    if (!user) return;
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch('http://localhost:3000/api/groups', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setGroups(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch groups");
+    }
+  };
+
+  useEffect(() => {
+    fetchGroups();
+  }, [user]);
+
+  // 4. Handle Auth Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    // UPDATED URLs: /api/auth/signup or /api/auth/login
-    const endpoint = isSignup 
-      ? 'http://localhost:3000/api/auth/signup' 
-      : 'http://localhost:3000/api/auth/login';
-      
+    const endpoint = isSignup ? 'http://localhost:3000/api/auth/signup' : 'http://localhost:3000/api/auth/login';
     const payload = isSignup ? { name, email, password } : { email, password };
 
     try {
@@ -50,9 +302,7 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-
       const data = await res.json();
-
       if (res.ok) {
         localStorage.setItem('token', data.token);
         setUser(data.user);
@@ -67,74 +317,48 @@ export default function App() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     setUser(null);
-    setEmail('');
-    setPassword('');
-    setName('');
+    setGroups([]);
+    setCurrentGroup(null);
   };
 
-  if (loading) return <h1>Loading...</h1>;
+  if (loading) return <h1 style={{ padding: '50px', textAlign: 'center', fontFamily: 'sans-serif' }}>Loading...</h1>;
 
-  // LOGGED IN VIEW
   if (user) {
     return (
-      <Layout user={user} onLogout={handleLogout}>
-        <Dashboard user={user} onLogout={handleLogout} />
+      <Layout 
+        user={user} 
+        onLogout={handleLogout}
+        groups={groups}
+        currentGroup={currentGroup}
+        onSelectGroup={setCurrentGroup}
+      >
+        {currentGroup ? (
+          <GroupPage 
+            group={currentGroup} 
+            onBack={() => setCurrentGroup(null)} 
+          />
+        ) : (
+          <Dashboard 
+            user={user} 
+            groups={groups} 
+            refreshGroups={fetchGroups} 
+          />
+        )}
       </Layout>
     );
   }
 
-  // LOGIN / SIGNUP VIEW
   return (
-    <div style={{ padding: '50px', textAlign: 'center' }}>
+    <div style={{ padding: '50px', textAlign: 'center', fontFamily: 'sans-serif', backgroundColor: '#f4f4f9', height: '100vh', color: '#333' }}>
       <h1>{isSignup ? "Create Account" : "Please Log In"}</h1>
-      
-      {error && <p style={{color: 'red'}}>{error}</p>}
-
-      <form onSubmit={handleSubmit}>
-        {isSignup && (
-          <>
-            <input 
-              placeholder="Name" 
-              value={name} 
-              onChange={e => setName(e.target.value)} 
-              required
-            />
-            <br /><br />
-          </>
-        )}
-
-        <input 
-          placeholder="Email" 
-          type="email"
-          value={email} 
-          onChange={e => setEmail(e.target.value)} 
-          required
-        />
-        <br /><br />
-        
-        <input 
-          type="password" 
-          placeholder="Password" 
-          value={password} 
-          onChange={e => setPassword(e.target.value)} 
-          required
-        />
-        <br /><br />
-        
-        <button type="submit">
-          {isSignup ? "Sign Up" : "Log In"}
-        </button>
+      {error && <p style={{color: '#e74c3c'}}>{error}</p>}
+      <form onSubmit={handleSubmit} style={{ maxWidth: '300px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+        {isSignup && (<input placeholder="Name" value={name} onChange={e => setName(e.target.value)} required style={{ padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}/>)}
+        <input placeholder="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} required style={{ padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}/>
+        <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required style={{ padding: '10px', border: '1px solid #ccc', borderRadius: '4px' }}/>
+        <button type="submit" style={{ padding: '10px', backgroundColor: '#3498db', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>{isSignup ? "Sign Up" : "Log In"}</button>
       </form>
-
-      <p>
-        {isSignup ? "Already have an account?" : "Need an account?"}{" "}
-        <button onClick={() => {
-          setIsSignup(!isSignup);
-          setError('');
-        }}>
-          {isSignup ? "Log In" : "Sign Up"}
-        </button>
-      </p>
+      <p style={{ marginTop: '20px' }}>{isSignup ? "Already have an account?" : "Need an account?"} <button onClick={() => { setIsSignup(!isSignup); setError(''); }} style={{ background: 'none', border: 'none', color: '#3498db', textDecoration: 'underline', cursor: 'pointer', fontSize: '1rem' }}>{isSignup ? "Log In" : "Sign Up"}</button></p>
     </div>
   );
 }
