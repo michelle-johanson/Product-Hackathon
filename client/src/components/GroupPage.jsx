@@ -11,6 +11,39 @@ export default function GroupPage({ group, onBack, socket, user, refreshGroups }
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
   const [editClassName, setEditClassName] = useState('');
+  const [sidebarWidth, setSidebarWidth] = useState(350);
+  const [isResizing, setIsResizing] = useState(false);
+
+  const startResizing = () => {
+    setIsResizing(true);
+  };
+
+  useEffect(() => {
+    const resize = (e) => {
+      if (isResizing) {
+        const newWidth = window.innerWidth - e.clientX;
+        if (newWidth >= 250 && newWidth <= window.innerWidth * 0.5) {
+          setSidebarWidth(newWidth);
+        }
+      }
+    };
+
+    const stopResizing = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      window.addEventListener('mousemove', resize);
+      window.addEventListener('mouseup', stopResizing);
+      document.body.style.userSelect = 'none';
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', resize);
+      window.removeEventListener('mouseup', stopResizing);
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing]);
 
   useEffect(() => {
     if (!group || !group.id) return;
@@ -201,8 +234,14 @@ export default function GroupPage({ group, onBack, socket, user, refreshGroups }
         )}
       </div>
 
+      {/* Resizer Handle */}
+      <div 
+        className="resizer-handle" 
+        onMouseDown={startResizing}
+      />
+
       {/* Right Panel - Chat Area */}
-      <div className="right-panel">
+      <div className="right-panel" style={{ width: sidebarWidth }}>
         {/* Toggle System */}
         <div className="chat-toggle-container">
           <button onClick={() => setChatMode('group')} className={`chat-toggle-btn ${chatMode === 'group' ? 'active' : ''}`}>

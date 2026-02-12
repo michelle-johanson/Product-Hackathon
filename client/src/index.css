@@ -182,6 +182,17 @@ input {
   padding: 30px;
 }
 
+.resizer-handle {
+  width: 4px;
+  cursor: col-resize;
+  background: transparent;
+  transition: background 0.2s;
+}
+
+.resizer-handle:hover, .resizer-handle:active {
+  background: #3498db;
+}
+
 .right-panel {
   width: 350px;
   border-left: 1px solid #ddd;
