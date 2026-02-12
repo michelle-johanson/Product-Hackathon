@@ -170,9 +170,10 @@ const Layout = ({ children, user, groups, currentGroup, onSelectGroup, onOpenCre
           </div>
         </header>
 
-        <main className="layout-content">
+        <main className={currentGroup && currentGroup !== 'settings' ? 'layout-content-flush' : 'layout-content'}>
           {children}
         </main>
+
       </div>
     </div>
   );

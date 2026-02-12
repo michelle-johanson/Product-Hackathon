@@ -295,6 +295,7 @@ input {
   border-left: 1px solid var(--color-border-default);
   height: 100%;
   margin: 0;
+  padding: 0;
   overflow-y: auto;
   background: var(--color-bg-surface);
   display: flex;
@@ -449,6 +450,7 @@ input {
   margin: 0;
   overflow: hidden;
   color: var(--color-text-primary);
+  height: 100%;
 }
 
 /* ===== 12. GROUP PAGE ===== */
