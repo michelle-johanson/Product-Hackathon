@@ -5,9 +5,9 @@
   "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
-    "dev": "nodemon server/index.js",
+    "dev": "npx kill-port 3000 >/dev/null 2>&1 && nodemon --quiet server/index.js",
     "dev:client": "cd client && npm run dev",
-    "dev:all": "concurrently \"npm run dev\" \"npm run dev:client\"",
+    "dev:all": "concurrently --raw --kill-others \"npm run dev\" \"npm run dev:client\"",
     "build": "cd client && npm run build",
     "postinstall": "cd client && npm install",
     "prisma:migrate": "npx prisma migrate dev",
