@@ -71,4 +71,27 @@ router.post('/join', async (req, res) => {
   }
 });
 
+// This tells the backend how to handle requests for a specific group ID
+router.get('/:id', async (req, res) => {
+  try {
+    const group = await prisma.group.findUnique({
+      where: { id: parseInt(req.params.id) },
+      include: {
+        members: {
+          include: {
+            user: {
+              select: { id: true, name: true, email: true } 
+            }
+          }
+        }
+      }
+    });
+
+    if (!group) return res.status(404).json({ error: 'Group not found' });
+    res.json(group);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch group details' });
+  }
+});
+
 module.exports = router;

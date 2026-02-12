@@ -127,3 +127,43 @@ input {
   border-radius: 4px;
   font-size: 1rem;
 }
+
+/* ADD THIS TO THE BOTTOM OF client/src/index.css */
+.sidebar-link {
+  padding: 12px 15px;
+  margin-bottom: 5px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #bdc3c7;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-link:hover {
+  background-color: #34495e;
+  color: white;
+}
+
+.sidebar-link.active {
+  background-color: #3498db;
+  color: white;
+  font-weight: bold;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: #3498db;
+  border: 1px solid #3498db;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.btn-secondary:hover {
+  background-color: #ebf5fb;
+}
