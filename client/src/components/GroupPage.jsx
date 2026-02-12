@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import ChatComponent from './ChatComponent';
+import SharedNotes from './SharedNotes'; // Import the new component
 
 export default function GroupPage({ group, onBack, socket, user }) {
   const [groupDetails, setGroupDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentTab, setCurrentTab] = useState('members');
 
-  // Fetch the full details of this specific group (including members)
   useEffect(() => {
-    // 1. ADDED SAFETY CHECK: Don't run if group is missing
     if (!group || !group.id) return; 
 
     const fetchGroupDetails = async () => {
@@ -30,12 +29,23 @@ export default function GroupPage({ group, onBack, socket, user }) {
     };
 
     fetchGroupDetails();
-  }, [group?.id]); // 2. ADDED QUESTION MARK (Optional Chaining)
+  }, [group?.id]);
 
-  // 3. ADDED SAFETY CHECK: Show a fallback if group is missing
   if (!group) return <div className="p-6">No group selected.</div>; 
   if (loading) return <div className="p-6">Loading group info...</div>;
   if (!groupDetails) return <div className="p-6">Failed to load group.</div>;
+
+  const tabStyle = (tabName) => ({
+    padding: '12px 20px',
+    background: currentTab === tabName ? '#3498db' : 'transparent',
+    color: currentTab === tabName ? 'white' : '#666',
+    border: 'none',
+    borderBottom: currentTab === tabName ? '3px solid #3498db' : 'none',
+    fontWeight: currentTab === tabName ? 'bold' : 'normal',
+    cursor: 'pointer',
+    fontSize: '1rem',
+    transition: 'all 0.2s'
+  });
 
   return (
     <div className="group-page" style={{ maxWidth: '800px', margin: '0 auto' }}>
@@ -46,55 +56,22 @@ export default function GroupPage({ group, onBack, socket, user }) {
       <div className="card" style={{ marginBottom: '20px', borderTop: '5px solid #3498db' }}>
         <h2 style={{ fontSize: '2rem', marginBottom: '5px' }}>{groupDetails.name}</h2>
         <p style={{ color: '#666', fontSize: '1.1rem', marginBottom: '15px' }}>Class: {groupDetails.className}</p>
-
         <div style={{ background: '#f4f4f9', padding: '10px', borderRadius: '5px', display: 'inline-block' }}>
           Share Invite Code: <strong style={{ letterSpacing: '2px', fontSize: '1.2rem' }}>{groupDetails.inviteCode}</strong>
         </div>
       </div>
 
-      {/* Tab Navigation */}
+      {/* Updated Tab Navigation */}
       <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', borderBottom: '2px solid #eee' }}>
-        <button
-          onClick={() => setCurrentTab('members')}
-          style={{
-            padding: '12px 20px',
-            background: currentTab === 'members' ? '#3498db' : 'transparent',
-            color: currentTab === 'members' ? 'white' : '#666',
-            border: 'none',
-            borderBottom: currentTab === 'members' ? '3px solid #3498db' : 'none',
-            fontWeight: currentTab === 'members' ? 'bold' : 'normal',
-            cursor: 'pointer',
-            fontSize: '1rem',
-            transition: 'all 0.2s'
-          }}
-        >
-          Members
-        </button>
-        <button
-          onClick={() => setCurrentTab('chat')}
-          style={{
-            padding: '12px 20px',
-            background: currentTab === 'chat' ? '#3498db' : 'transparent',
-            color: currentTab === 'chat' ? 'white' : '#666',
-            border: 'none',
-            borderBottom: currentTab === 'chat' ? '3px solid #3498db' : 'none',
-            fontWeight: currentTab === 'chat' ? 'bold' : 'normal',
-            cursor: 'pointer',
-            fontSize: '1rem',
-            transition: 'all 0.2s'
-          }}
-        >
-          Chat
-        </button>
+        <button onClick={() => setCurrentTab('members')} style={tabStyle('members')}>Members</button>
+        <button onClick={() => setCurrentTab('notes')} style={tabStyle('notes')}>Notes</button>
+        <button onClick={() => setCurrentTab('chat')} style={tabStyle('chat')}>Chat</button>
       </div>
 
-      {/* Members Tab */}
+      {/* Tab Content */}
       {currentTab === 'members' && (
         <div className="card">
-          <h3 style={{ marginBottom: '15px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
-            Team Members ({groupDetails.members?.length || 0})
-          </h3>
-
+          <h3 style={{ marginBottom: '15px' }}>Team Members ({groupDetails.members?.length || 0})</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {groupDetails.members?.map((member) => (
               <div key={member.id} style={{ display: 'flex', alignItems: 'center', gap: '15px', padding: '10px', background: '#f9f9fc', borderRadius: '5px' }}>
@@ -111,7 +88,10 @@ export default function GroupPage({ group, onBack, socket, user }) {
         </div>
       )}
 
-      {/* Chat Tab */}
+      {currentTab === 'notes' && (
+        <SharedNotes groupId={group.id} socket={socket} />
+      )}
+
       {currentTab === 'chat' && (
         <ChatComponent groupId={group.id} socket={socket} user={user} />
       )}

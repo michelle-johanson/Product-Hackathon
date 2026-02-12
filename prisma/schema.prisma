@@ -58,7 +58,7 @@ model GroupMember {
 
 model Note {
   id           Int      @id @default(autoincrement())
-  groupId      Int      @map("group_id")
+  groupId      Int      @unique @map("group_id")
   title        String
   content      String   @default("")
   lastEditedBy Int      @map("last_edited_by")
