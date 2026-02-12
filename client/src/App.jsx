@@ -1,102 +1,152 @@
 import React, { useState, useEffect } from 'react';
 import GroupPage from './components/GroupPage';
 
-// --- Dashboard Component ---
-const Dashboard = ({ user, groups, refreshGroups }) => {
-  const [view, setView] = useState('menu');
-  const [groupName, setGroupName] = useState('');
-  const [className, setClassName] = useState('');
-  const [joinCode, setJoinCode] = useState('');
+// --- AccountSettings Component ---
+const AccountSettings = ({ user, onLogout, onDeleteAccount, onUpdateProfile }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(user.name);
+  const [editEmail, setEditEmail] = useState(user.email);
+  const [error, setError] = useState('');
 
-  const handleCreateGroup = async (e) => {
+  const handleUpdateProfile = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem('token');
-    try {
-      const res = await fetch('http://localhost:3000/api/groups', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ name: groupName, className })
-      });
-      if (res.ok) {
-        refreshGroups();
-        setView('menu');
-        setGroupName('');
-        setClassName('');
-      }
-    } catch (err) {
-      console.error("Error creating group:", err);
+    setError('');
+    const success = await onUpdateProfile(editName, editEmail);
+    if (success) {
+      setIsEditing(false);
+    } else {
+      setError('Failed to update profile');
     }
   };
 
-  const handleJoinGroup = async (e) => {
-    e.preventDefault();
-    const token = localStorage.getItem('token');
-    try {
-      const res = await fetch('http://localhost:3000/api/groups/join', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ inviteCode: joinCode })
-      });
-      if (res.ok) {
-        refreshGroups();
-        setView('menu');
-        setJoinCode('');
-      }
-    } catch (err) {
-      console.error("Error joining group:", err);
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm(
+      'Are you sure you want to delete your account? This action is permanent and will:\n\n' +
+      '• Delete all your groups if you are the last member\n' +
+      '• Remove all your messages and notes\n' +
+      '• Cannot be undone\n\n' +
+      'Type "DELETE" in the next prompt to confirm.'
+    );
+
+    if (!confirmed) return;
+
+    const confirmation = prompt('Type DELETE to confirm account deletion:');
+    if (confirmation === 'DELETE') {
+      await onDeleteAccount();
     }
   };
 
-  if (view === 'menu') {
-    return (
-      <div className="dashboard-container">
-        <h2 className="dashboard-heading">Dashboard Overview</h2>
-        <div className="dashboard-grid">
-          <button onClick={() => setView('add_group')} className="add-group-btn">
-            <span className="add-group-icon">+</span>
-            <span className="add-group-text">Create or Join a Group</span>
+  return (
+    <div className="dashboard-container">
+      <h2 className="dashboard-heading">Account Settings</h2>
+
+      <div className="card" style={{ marginBottom: '20px' }}>
+        <h3 style={{ marginBottom: '15px' }}>Profile Information</h3>
+        {error && <p className="auth-error">{error}</p>}
+
+        {isEditing ? (
+          <form onSubmit={handleUpdateProfile}>
+            <div className="form-group">
+              <label className="form-label">Name</label>
+              <input
+                className="form-input"
+                value={editName}
+                onChange={e => setEditName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Email</label>
+              <input
+                className="form-input"
+                type="email"
+                value={editEmail}
+                onChange={e => setEditEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
+              <button type="submit" className="btn-create" style={{ flex: 1 }}>
+                Save Changes
+              </button>
+              <button
+                type="button"
+                className="btn-secondary"
+                style={{ flex: 1 }}
+                onClick={() => {
+                  setIsEditing(false);
+                  setEditName(user.name);
+                  setEditEmail(user.email);
+                  setError('');
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        ) : (
+          <>
+            <div style={{ marginBottom: '15px' }}>
+              <div style={{ color: '#666', fontSize: '0.9rem' }}>Name</div>
+              <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>{user.name}</div>
+            </div>
+            <div style={{ marginBottom: '15px' }}>
+              <div style={{ color: '#666', fontSize: '0.9rem' }}>Email</div>
+              <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>{user.email}</div>
+            </div>
+            <button
+              className="btn-primary"
+              onClick={() => setIsEditing(true)}
+            >
+              Edit Profile
+            </button>
+          </>
+        )}
+      </div>
+
+      <div className="card" style={{ borderTop: '3px solid #e74c3c' }}>
+        <h3 style={{ marginBottom: '15px', color: '#e74c3c' }}>Danger Zone</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <button
+            className="layout-logout-btn"
+            onClick={onLogout}
+            style={{
+              padding: '10px 20px',
+              justifyContent: 'center',
+              border: '1px solid #ff6b6b',
+              borderRadius: '5px'
+            }}
+          >
+            <span>🚪</span>
+            <span>Log Out</span>
+          </button>
+          <button
+            onClick={handleDeleteAccount}
+            style={{
+              padding: '10px 20px',
+              background: '#e74c3c',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px'
+            }}
+          >
+            <span>🗑️</span>
+            <span>Delete Account</span>
           </button>
         </div>
       </div>
-    );
-  }
-
-  if (view === 'add_group') {
-    return (
-      <div className="form-container">
-        <button onClick={() => setView('menu')} className="back-button">← Back</button>
-        <div className="form-section">
-          <h2>Create a New Group</h2>
-          <form onSubmit={handleCreateGroup}>
-            <div className="form-group">
-              <label className="form-label">Group Name</label>
-              <input className="form-input" value={groupName} onChange={e => setGroupName(e.target.value)} required />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Class Name</label>
-              <input className="form-input" value={className} onChange={e => setClassName(e.target.value)} required />
-            </div>
-            <button type="submit" className="btn-create">Create Group</button>
-          </form>
-        </div>
-        <hr className="form-divider" />
-        <div className="form-section">
-          <h2>OR Join Existing Group</h2>
-          <form onSubmit={handleJoinGroup}>
-            <div className="form-group">
-              <label className="form-label">Enter Invite Code</label>
-              <input className="form-input" placeholder="e.g. x7z9q2" value={joinCode} onChange={e => setJoinCode(e.target.value)} required />
-            </div>
-            <button type="submit" className="btn-join">Join Group</button>
-          </form>
-        </div>
-      </div>
-    );
-  }
+    </div>
+  );
 };
 
 // --- Layout Component ---
-const Layout = ({ children, user, onLogout, groups, currentGroup, onSelectGroup }) => {
+const Layout = ({ children, user, groups, currentGroup, onSelectGroup, onOpenCreateModal, onOpenJoinModal, onNavigateSettings }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
@@ -110,8 +160,8 @@ const Layout = ({ children, user, onLogout, groups, currentGroup, onSelectGroup 
         </div>
 
         <nav className="layout-nav">
-          <div onClick={() => onSelectGroup(null)} className={`sidebar-link ${!currentGroup ? 'active' : ''}`}>
-            {sidebarOpen ? '🏠 Dashboard' : '🏠'}
+          <div onClick={onNavigateSettings} className={`sidebar-link ${currentGroup === 'settings' ? 'active' : ''}`}>
+            {sidebarOpen ? '⚙️ Settings' : '⚙️'}
           </div>
 
           {sidebarOpen && (
@@ -127,10 +177,22 @@ const Layout = ({ children, user, onLogout, groups, currentGroup, onSelectGroup 
           ))}
         </nav>
 
-        <button onClick={onLogout} className="layout-logout-btn">
-          <span>🚪</span>
-          {sidebarOpen && <span>Log Out</span>}
-        </button>
+        <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', paddingTop: '20px', borderTop: '1px solid #34495e' }}>
+          <button
+            onClick={onOpenCreateModal}
+            className="sidebar-link"
+            style={{ justifyContent: sidebarOpen ? 'flex-start' : 'center', background: '#27ae60', color: 'white' }}
+          >
+            {sidebarOpen ? '+ Create Group' : '+'}
+          </button>
+          <button
+            onClick={onOpenJoinModal}
+            className="sidebar-link"
+            style={{ justifyContent: sidebarOpen ? 'flex-start' : 'center', background: '#3498db', color: 'white' }}
+          >
+            {sidebarOpen ? '🔗 Join Group' : '🔗'}
+          </button>
+        </div>
       </aside>
 
       <div className="layout-main">
@@ -149,6 +211,46 @@ const Layout = ({ children, user, onLogout, groups, currentGroup, onSelectGroup 
   );
 };
 
+// --- Modal Component ---
+const Modal = ({ isOpen, onClose, title, children }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: 'rgba(0,0,0,0.5)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 1000
+    }}>
+      <div className="form-container" style={{ maxWidth: '500px', position: 'relative' }}>
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: '10px',
+            right: '10px',
+            background: 'none',
+            border: 'none',
+            fontSize: '1.5rem',
+            cursor: 'pointer',
+            color: '#666'
+          }}
+        >
+          ×
+        </button>
+        <h2 style={{ marginBottom: '20px' }}>{title}</h2>
+        {children}
+      </div>
+    </div>
+  );
+};
+
 // --- Main App Component ---
 export default function App() {
   const [user, setUser] = useState(null);
@@ -158,7 +260,14 @@ export default function App() {
   // App State
   const [isSignup, setIsSignup] = useState(false);
   const [groups, setGroups] = useState([]);
-  const [currentGroup, setCurrentGroup] = useState(null); 
+  const [currentGroup, setCurrentGroup] = useState(null);
+
+  // Modal State
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showJoinModal, setShowJoinModal] = useState(false);
+  const [groupName, setGroupName] = useState('');
+  const [className, setClassName] = useState('');
+  const [joinCode, setJoinCode] = useState('');
 
   // Form State
   const [name, setName] = useState('');
@@ -259,6 +368,102 @@ export default function App() {
     }
   };
 
+  // Handle Create Group
+  const handleCreateGroup = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch('http://localhost:3000/api/groups', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ name: groupName, className })
+      });
+      if (res.ok) {
+        await fetchGroups();
+        setShowCreateModal(false);
+        setGroupName('');
+        setClassName('');
+      }
+    } catch (err) {
+      console.error("Error creating group:", err);
+    }
+  };
+
+  // Handle Join Group
+  const handleJoinGroup = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch('http://localhost:3000/api/groups/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ inviteCode: joinCode })
+      });
+      if (res.ok) {
+        await fetchGroups();
+        setShowJoinModal(false);
+        setJoinCode('');
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to join group');
+      }
+    } catch (err) {
+      console.error("Error joining group:", err);
+    }
+  };
+
+  // Handle Update Profile
+  const handleUpdateProfile = async (newName, newEmail) => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch('http://localhost:3000/api/auth/me', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ name: newName, email: newEmail })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+        return true;
+      } else {
+        const data = await res.json();
+        alert(data.error || 'Failed to update profile');
+        return false;
+      }
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      return false;
+    }
+  };
+
+  // Handle Delete Account
+  const handleDeleteAccount = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch('http://localhost:3000/api/auth/me', {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (res.ok) {
+        localStorage.removeItem('token');
+        setUser(null);
+        setGroups([]);
+        setCurrentGroup(null);
+        alert('Your account has been deleted successfully.');
+      } else {
+        alert('Failed to delete account. Please try again.');
+      }
+    } catch (err) {
+      console.error("Error deleting account:", err);
+      alert('Network error occurred.');
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     setUser(null);
@@ -270,29 +475,104 @@ export default function App() {
 
   if (user) {
     return (
-      <Layout
-        user={user}
-        onLogout={handleLogout}
-        groups={groups}
-        currentGroup={currentGroup}
-        onSelectGroup={setCurrentGroup}
-      >
-        {currentGroup ? (
-          <GroupPage
-            group={currentGroup}
-            onBack={() => setCurrentGroup(null)}
-            socket={socket}
-            user={user}
-            refreshGroups={fetchGroups}
-          />
-        ) : (
-          <Dashboard
-            user={user}
-            groups={groups}
-            refreshGroups={fetchGroups}
-          />
-        )}
-      </Layout>
+      <>
+        <Layout
+          user={user}
+          groups={groups}
+          currentGroup={currentGroup}
+          onSelectGroup={setCurrentGroup}
+          onOpenCreateModal={() => setShowCreateModal(true)}
+          onOpenJoinModal={() => setShowJoinModal(true)}
+          onNavigateSettings={() => setCurrentGroup('settings')}
+        >
+          {currentGroup === 'settings' ? (
+            <AccountSettings
+              user={user}
+              onLogout={handleLogout}
+              onDeleteAccount={handleDeleteAccount}
+              onUpdateProfile={handleUpdateProfile}
+            />
+          ) : currentGroup ? (
+            <GroupPage
+              group={currentGroup}
+              onBack={() => setCurrentGroup('settings')}
+              socket={socket}
+              user={user}
+              refreshGroups={fetchGroups}
+            />
+          ) : (
+            <AccountSettings
+              user={user}
+              onLogout={handleLogout}
+              onDeleteAccount={handleDeleteAccount}
+              onUpdateProfile={handleUpdateProfile}
+            />
+          )}
+        </Layout>
+
+        {/* Create Group Modal */}
+        <Modal
+          isOpen={showCreateModal}
+          onClose={() => {
+            setShowCreateModal(false);
+            setGroupName('');
+            setClassName('');
+          }}
+          title="Create a New Group"
+        >
+          <form onSubmit={handleCreateGroup}>
+            <div className="form-group">
+              <label className="form-label">Group Name</label>
+              <input
+                className="form-input"
+                value={groupName}
+                onChange={e => setGroupName(e.target.value)}
+                required
+                placeholder="e.g., Study Group 1"
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Class Name</label>
+              <input
+                className="form-input"
+                value={className}
+                onChange={e => setClassName(e.target.value)}
+                required
+                placeholder="e.g., CS 101"
+              />
+            </div>
+            <button type="submit" className="btn-create">
+              Create Group
+            </button>
+          </form>
+        </Modal>
+
+        {/* Join Group Modal */}
+        <Modal
+          isOpen={showJoinModal}
+          onClose={() => {
+            setShowJoinModal(false);
+            setJoinCode('');
+          }}
+          title="Join Existing Group"
+        >
+          <form onSubmit={handleJoinGroup}>
+            <div className="form-group">
+              <label className="form-label">Enter Invite Code</label>
+              <input
+                className="form-input"
+                value={joinCode}
+                onChange={e => setJoinCode(e.target.value)}
+                required
+                placeholder="e.g., x7z9q2"
+              />
+            </div>
+            <button type="submit" className="btn-join">
+              Join Group
+            </button>
+          </form>
+        </Modal>
+      </>
     );
   }
 
