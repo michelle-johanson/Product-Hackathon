@@ -1,15 +1,15 @@
 const jwt = require('jsonwebtoken');
 
+// Matches the secret in your auth routes
+const SECRET_KEY = process.env.JWT_SECRET || "my_super_secret_hand_stamp_ink";
+
 module.exports = (req, res, next) => {
-  // 1. Check for the Authorization header
   const authHeader = req.headers.authorization;
   
   if (!authHeader) {
-    // Return 401 so the frontend knows to stop waiting and show the Login screen
     return res.status(401).json({ error: 'Access denied. No token provided.' });
   }
 
-  // 2. Extract the token
   const token = authHeader.split(' ')[1];
   
   if (!token) {
@@ -17,13 +17,11 @@ module.exports = (req, res, next) => {
   }
 
   try {
-    // 3. Verify the token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { id: decoded.userId, email: decoded.email };
-    
-    // 4. CRITICAL: Allow the request to proceed
+    const decoded = jwt.verify(token, SECRET_KEY);
+    // Attach the user info to the request so routes can use it
+    req.user = decoded; 
     next();
   } catch (err) {
-    return res.status(401).json({ error: 'Invalid token.' });
+    res.status(401).json({ error: 'Invalid token.' });
   }
 };

@@ -1,10 +1,12 @@
-// client/src/lib/api.js
-const API_BASE = "/api"; // Keep this relative!
+const API_BASE = "http://localhost:3000/api";
 
 export async function apiRequest(endpoint, options = {}) {
   const token = localStorage.getItem("token");
 
-  const res = await fetch(`${API_BASE}${endpoint}`, {
+  // Ensure endpoint starts with / (e.g. "/groups")
+  const url = `${API_BASE}${endpoint.startsWith("/") ? endpoint : "/" + endpoint}`;
+
+  const res = await fetch(url, {
     headers: {
       "Content-Type": "application/json",
       ...(token && { Authorization: `Bearer ${token}` }),

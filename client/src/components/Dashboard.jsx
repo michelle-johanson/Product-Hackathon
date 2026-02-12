@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 export default function Dashboard({ user, onLogout }) {
-  const [view, setView] = useState('menu'); // 'menu' | 'add_group' | 'view_groups'
+  const [view, setView] = useState('menu'); 
   
   const [groups, setGroups] = useState([]);
   const [loadingGroups, setLoadingGroups] = useState(false);
@@ -10,7 +10,7 @@ export default function Dashboard({ user, onLogout }) {
   const [groupName, setGroupName] = useState('');
   const [className, setClassName] = useState('');
 
-  // JOIN Group State (NEW!)
+  // JOIN Group State
   const [joinCode, setJoinCode] = useState('');
 
   // --- API CALLS ---
@@ -19,7 +19,8 @@ export default function Dashboard({ user, onLogout }) {
     setLoadingGroups(true);
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch('http://localhost:3000/groups', {
+      // UPDATED URL
+      const res = await fetch('http://localhost:3000/api/groups', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -35,7 +36,8 @@ export default function Dashboard({ user, onLogout }) {
     e.preventDefault();
     const token = localStorage.getItem('token');
 
-    const res = await fetch('http://localhost:3000/groups', {
+    // UPDATED URL
+    const res = await fetch('http://localhost:3000/api/groups', {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
@@ -46,7 +48,7 @@ export default function Dashboard({ user, onLogout }) {
 
     if (res.ok) {
       alert("Group Created Successfully!");
-      setView('view_groups'); // Send them to the list to see it
+      setView('view_groups'); 
       setGroupName('');
       setClassName('');
     } else {
@@ -54,12 +56,12 @@ export default function Dashboard({ user, onLogout }) {
     }
   };
 
-  // NEW: Handle Joining
   const handleJoinGroup = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
 
-    const res = await fetch('http://localhost:3000/groups/join', {
+    // UPDATED URL
+    const res = await fetch('http://localhost:3000/api/groups/join', {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
@@ -72,10 +74,10 @@ export default function Dashboard({ user, onLogout }) {
 
     if (res.ok) {
       alert("You joined the group!");
-      setView('view_groups'); // Send them to the list
+      setView('view_groups'); 
       setJoinCode('');
     } else {
-      alert(data.error); // Show "Invalid Code" or "Already Joined"
+      alert(data.error); 
     }
   };
 
@@ -89,41 +91,37 @@ export default function Dashboard({ user, onLogout }) {
 
   // --- VIEWS ---
 
-  // 1. MENU
-  if (view === 'menu') {
+if (view === 'menu') {
     return (
-      <div style={{ padding: '50px', textAlign: 'center' }}>
-        <h1>Welcome, {user.name}!</h1>
+      <div className="max-w-4xl mx-auto">
+        <h2 className="text-2xl font-bold mb-6">Dashboard Overview</h2>
         
-        <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', marginTop: '40px' }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <button 
             onClick={() => setView('add_group')}
-            style={{ padding: '20px 40px', fontSize: '18px', cursor: 'pointer' }}
+            className="p-8 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all flex flex-col items-center gap-4 text-gray-600 hover:text-blue-600"
           >
-            + Add / Join Group
+            <span className="text-4xl">+</span>
+            <span className="font-semibold text-lg">Create or Join a Group</span>
           </button>
 
           <button 
             onClick={() => setView('view_groups')}
-            style={{ padding: '20px 40px', fontSize: '18px', cursor: 'pointer' }}
+            className="p-8 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all bg-white flex flex-col items-center gap-4 text-gray-800"
           >
-            View My Groups
+            <span className="text-4xl">📚</span>
+            <span className="font-semibold text-lg">View My Groups</span>
           </button>
         </div>
-
-        <br /><br />
-        <button onClick={onLogout} style={{ color: 'red' }}>Log Out</button>
       </div>
     );
   }
 
-  // 2. ADD / JOIN GROUP
   if (view === 'add_group') {
     return (
       <div style={{ padding: '50px', maxWidth: '400px', margin: '0 auto' }}>
         <button onClick={() => setView('menu')}>← Back to Menu</button>
         
-        {/* CREATE FORM */}
         <div style={{ marginBottom: '40px' }}>
           <h2>Create a New Group</h2>
           <form onSubmit={handleCreateGroup}>
@@ -153,7 +151,6 @@ export default function Dashboard({ user, onLogout }) {
 
         <hr />
 
-        {/* JOIN FORM */}
         <div style={{ marginTop: '40px' }}>
           <h2>OR Join Existing Group</h2>
           <form onSubmit={handleJoinGroup}>
@@ -176,7 +173,6 @@ export default function Dashboard({ user, onLogout }) {
     );
   }
 
-  // 3. VIEW GROUPS
   if (view === 'view_groups') {
     return (
       <div style={{ padding: '50px', maxWidth: '600px', margin: '0 auto' }}>

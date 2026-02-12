@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import Dashboard from './Dashboard';
+import Dashboard from './components/Dashboard'; 
+import Layout from './Layout';
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -18,7 +19,8 @@ export default function App() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      fetch('http://localhost:3000/me', {
+      // UPDATED URL: /api/auth/me
+      fetch('http://localhost:3000/api/auth/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       .then(res => res.ok ? res.json() : Promise.reject())
@@ -35,7 +37,11 @@ export default function App() {
     e.preventDefault();
     setError('');
 
-    const endpoint = isSignup ? 'http://localhost:3000/signup' : 'http://localhost:3000/login';
+    // UPDATED URLs: /api/auth/signup or /api/auth/login
+    const endpoint = isSignup 
+      ? 'http://localhost:3000/api/auth/signup' 
+      : 'http://localhost:3000/api/auth/login';
+      
     const payload = isSignup ? { name, email, password } : { email, password };
 
     try {
@@ -69,8 +75,12 @@ export default function App() {
   if (loading) return <h1>Loading...</h1>;
 
   // LOGGED IN VIEW
-if (user) {
-    return <Dashboard user={user} onLogout={handleLogout} />;
+  if (user) {
+    return (
+      <Layout user={user} onLogout={handleLogout}>
+        <Dashboard user={user} onLogout={handleLogout} />
+      </Layout>
+    );
   }
 
   // LOGIN / SIGNUP VIEW
