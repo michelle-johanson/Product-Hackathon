@@ -144,65 +144,46 @@ export default function ChatComponent({ groupId, socket, user }) {
   };
 
   return (
-    <div className="chat-component" style={{ display: 'flex', flexDirection: 'column', height: '600px', background: '#fff', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+    <div className="chat-component">
       {/* Header */}
-      <div style={{ padding: '15px', borderBottom: '1px solid #eee', background: '#f9f9fc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3 style={{ margin: '0', fontSize: '1rem' }}>Group Chat</h3>
-        <div style={{ fontSize: '0.8rem', color: connectionStatus === 'connected' ? '#27ae60' : '#e74c3c' }}>
+      <div className="chat-header">
+        <h3 className="chat-title">Group Chat</h3>
+        <div className={`connection-status ${connectionStatus}`}>
           {connectionStatus === 'connected' ? '🟢 Connected' : connectionStatus === 'connecting' ? '🟡 Connecting...' : '🔴 Disconnected'}
         </div>
       </div>
 
       {/* Messages List */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '15px', display: 'flex', flexDirection: 'column', gap: '10px', background: '#fafafa' }}>
+      <div className="chat-history">
         {loading ? (
-          <div style={{ textAlign: 'center', color: '#999', margin: 'auto' }}>
+          <div className="chat-loading">
             Loading messages...
           </div>
         ) : messages.length === 0 ? (
-          <div style={{ textAlign: 'center', color: '#bbb', margin: 'auto' }}>
+          <div className="chat-empty">
             No messages yet. Start the conversation!
           </div>
         ) : (
           messages.map((msg, idx) => (
             <div
               key={msg.id || idx}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                marginBottom: '8px',
-                padding: '10px',
-                background: msg.userId === user?.id ? '#e8f4f8' : '#fff',
-                borderRadius: '8px',
-                borderLeft: msg.userId === user?.id ? '3px solid #3498db' : '3px solid #bdc3c7'
-              }}
+              className={`message-bubble ${msg.userId === user?.id ? 'own-message' : ''}`}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '5px' }}>
-                <div style={{
-                  width: '30px',
-                  height: '30px',
-                  background: '#3498db',
-                  color: 'white',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '0.9rem',
-                  fontWeight: 'bold'
-                }}>
+              <div className="message-header">
+                <div className="message-avatar">
                   {msg.userName?.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <div style={{ fontWeight: 'bold', fontSize: '0.95rem' }}>
+                  <div className="message-user-name">
                     {msg.userName}
-                    {msg.userId === user?.id && <span style={{ fontSize: '0.8rem', color: '#7f8c8d', marginLeft: '8px' }}>(you)</span>}
+                    {msg.userId === user?.id && <span className="message-you-label">(you)</span>}
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: '#999' }}>
+                  <div className="message-timestamp">
                     {new Date(msg.createdAt).toLocaleTimeString()}
                   </div>
                 </div>
               </div>
-              <div style={{ fontSize: '0.95rem', color: '#333', marginLeft: '38px' }}>
+              <div className="message-content">
                 {msg.content}
               </div>
             </div>
@@ -213,44 +194,24 @@ export default function ChatComponent({ groupId, socket, user }) {
 
       {/* Error Message */}
       {error && (
-        <div style={{ padding: '10px', background: '#ffe8e8', color: '#c0392b', borderBottom: '1px solid #e8e8e8', fontSize: '0.9rem' }}>
+        <div className="chat-error">
           {error}
         </div>
       )}
 
       {/* Input Form */}
-      <form onSubmit={handleSendMessage} style={{ padding: '15px', borderTop: '1px solid #eee', background: '#fff', display: 'flex', gap: '10px' }}>
+      <form onSubmit={handleSendMessage} className="chat-input-form">
         <textarea
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder="Type a message..."
           disabled={!socket || socket.readyState !== 1}
-          style={{
-            flex: 1,
-            padding: '10px',
-            border: '1px solid #ddd',
-            borderRadius: '5px',
-            fontFamily: 'inherit',
-            fontSize: '0.95rem',
-            resize: 'none',
-            minHeight: '50px',
-            maxHeight: '100px',
-            opacity: socket && socket.readyState === 1 ? 1 : 0.5
-          }}
+          className="chat-textarea"
         />
         <button
           type="submit"
           disabled={sending || !socket || socket.readyState !== 1 || !inputValue.trim()}
-          style={{
-            padding: '10px 20px',
-            background: sending || !socket || socket.readyState !== 1 ? '#bdc3c7' : '#3498db',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            fontWeight: 'bold',
-            cursor: (sending || !socket || socket.readyState !== 1) ? 'not-allowed' : 'pointer',
-            alignSelf: 'flex-end'
-          }}
+          className="chat-send-btn"
         >
           {sending ? 'Sending...' : 'Send'}
         </button>

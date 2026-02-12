@@ -94,4 +94,63 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// POST /api/groups/:groupId/leave - Leave group & cleanup if empty
+router.post('/:groupId/leave', async (req, res) => {
+  try {
+    const groupId = parseInt(req.params.groupId);
+    const userId = req.user.id;
+
+    // 1. Check if user is actually a member
+    const member = await prisma.groupMember.findUnique({
+      where: { groupId_userId: { groupId, userId } }
+    });
+
+    if (!member) {
+      return res.status(403).json({ error: 'You are not a member of this group' });
+    }
+
+    // 2. Remove the member
+    await prisma.groupMember.delete({
+      where: { groupId_userId: { groupId, userId } }
+    });
+
+    // 3. Check if group is empty and delete if so
+    const remainingCount = await prisma.groupMember.count({ where: { groupId } });
+    if (remainingCount === 0) {
+      await prisma.group.delete({ where: { id: groupId } });
+    }
+
+    res.json({ message: 'Successfully left the group' });
+  } catch (err) {
+    console.error('Error leaving group:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PATCH /api/groups/:groupId - Update group details
+router.patch('/:groupId', async (req, res) => {
+  try {
+    const groupId = parseInt(req.params.groupId);
+    const { name, className } = req.body;
+    const userId = req.user.id;
+
+    // Check if user is a member
+    const member = await prisma.groupMember.findUnique({
+      where: { groupId_userId: { groupId, userId } }
+    });
+
+    if (!member) return res.status(403).json({ error: 'You are not a member of this group' });
+
+    const updatedGroup = await prisma.group.update({
+      where: { id: groupId },
+      data: { name, className }
+    });
+
+    res.json(updatedGroup);
+  } catch (err) {
+    console.error('Error updating group:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 module.exports = router;

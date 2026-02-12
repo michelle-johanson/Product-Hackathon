@@ -1,14 +1,52 @@
 import { useState, useEffect } from 'react';
 import ChatComponent from './ChatComponent';
-import SharedNotes from './SharedNotes'; // Import the new component
+import SharedNotes from './SharedNotes';
+import AiChatComponent from './AiChatComponent';
 
-export default function GroupPage({ group, onBack, socket, user }) {
+export default function GroupPage({ group, onBack, socket, user, refreshGroups }) {
   const [groupDetails, setGroupDetails] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentTab, setCurrentTab] = useState('members');
+  const [currentTab, setCurrentTab] = useState('classinfo');
+  const [chatMode, setChatMode] = useState('group'); // 'group' or 'ai'
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editClassName, setEditClassName] = useState('');
+  const [sidebarWidth, setSidebarWidth] = useState(350);
+  const [isResizing, setIsResizing] = useState(false);
+
+  const startResizing = () => {
+    setIsResizing(true);
+  };
 
   useEffect(() => {
-    if (!group || !group.id) return; 
+    const resize = (e) => {
+      if (isResizing) {
+        const newWidth = window.innerWidth - e.clientX;
+        if (newWidth >= 250 && newWidth <= window.innerWidth * 0.5) {
+          setSidebarWidth(newWidth);
+        }
+      }
+    };
+
+    const stopResizing = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      window.addEventListener('mousemove', resize);
+      window.addEventListener('mouseup', stopResizing);
+      document.body.style.userSelect = 'none';
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', resize);
+      window.removeEventListener('mouseup', stopResizing);
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing]);
+
+  useEffect(() => {
+    if (!group || !group.id) return;
 
     const fetchGroupDetails = async () => {
       setLoading(true);
@@ -31,70 +69,198 @@ export default function GroupPage({ group, onBack, socket, user }) {
     fetchGroupDetails();
   }, [group?.id]);
 
-  if (!group) return <div className="p-6">No group selected.</div>; 
+  useEffect(() => {
+    if (groupDetails) {
+      setEditName(groupDetails.name);
+      setEditClassName(groupDetails.className);
+    }
+  }, [groupDetails]);
+
+  const handleUpdateGroup = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:3000/api/groups/${group.id}`, {
+        method: 'PATCH',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({ name: editName, className: editClassName })
+      });
+
+      if (res.ok) {
+        const updated = await res.json();
+        setGroupDetails(prev => ({ ...prev, name: updated.name, className: updated.className }));
+        if (refreshGroups) refreshGroups();
+        setIsEditing(false);
+      } else {
+        alert("Failed to update group.");
+      }
+    } catch (err) {
+      console.error("Error updating group:", err);
+      alert("Network error.");
+    }
+  };
+
+  const handleLeaveGroup = async () => {
+    const confirmed = window.confirm("Are you sure you want to leave this group? If you are the last member, the group and all notes will be permanently deleted.");
+    if (!confirmed) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:3000/api/groups/${group.id}/leave`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (res.ok) {
+        if (refreshGroups) refreshGroups();
+        onBack();
+      } else {
+        alert("Failed to leave group. Please try again.");
+      }
+    } catch (err) {
+      console.error("Error leaving group:", err);
+      alert("Network error occurred.");
+    }
+  };
+
+  if (!group) return <div className="p-6">No group selected.</div>;
   if (loading) return <div className="p-6">Loading group info...</div>;
   if (!groupDetails) return <div className="p-6">Failed to load group.</div>;
 
-  const tabStyle = (tabName) => ({
-    padding: '12px 20px',
-    background: currentTab === tabName ? '#3498db' : 'transparent',
-    color: currentTab === tabName ? 'white' : '#666',
-    border: 'none',
-    borderBottom: currentTab === tabName ? '3px solid #3498db' : 'none',
-    fontWeight: currentTab === tabName ? 'bold' : 'normal',
-    cursor: 'pointer',
-    fontSize: '1rem',
-    transition: 'all 0.2s'
-  });
-
   return (
-    <div className="group-page" style={{ maxWidth: '800px', margin: '0 auto' }}>
-      <button onClick={onBack} className="btn-secondary" style={{ marginBottom: '20px' }}>
-        ← Back to Dashboard
-      </button>
-      
-      <div className="card" style={{ marginBottom: '20px', borderTop: '5px solid #3498db' }}>
-        <h2 style={{ fontSize: '2rem', marginBottom: '5px' }}>{groupDetails.name}</h2>
-        <p style={{ color: '#666', fontSize: '1.1rem', marginBottom: '15px' }}>Class: {groupDetails.className}</p>
-        <div style={{ background: '#f4f4f9', padding: '10px', borderRadius: '5px', display: 'inline-block' }}>
-          Share Invite Code: <strong style={{ letterSpacing: '2px', fontSize: '1.2rem' }}>{groupDetails.inviteCode}</strong>
+    <div className="group-page-container" style={{ width: '100%', height: '100%', padding: 0, margin: 0 }}>
+      {/* Center Content Area */}
+      <div className="center-content" style={{ padding: '20px' }}>
+        <div className="card group-header-card">
+          {isEditing ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <input 
+                className="form-input"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                placeholder="Group Name"
+              />
+              <input 
+                className="form-input"
+                value={editClassName}
+                onChange={(e) => setEditClassName(e.target.value)}
+                placeholder="Class Name"
+              />
+            </div>
+          ) : (
+            <>
+              <h2 className="group-title">{groupDetails.name}</h2>
+              <p className="group-subtitle">Class: {groupDetails.className}</p>
+            </>
+          )}
         </div>
-      </div>
 
-      {/* Updated Tab Navigation */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', borderBottom: '2px solid #eee' }}>
-        <button onClick={() => setCurrentTab('members')} style={tabStyle('members')}>Members</button>
-        <button onClick={() => setCurrentTab('notes')} style={tabStyle('notes')}>Notes</button>
-        <button onClick={() => setCurrentTab('chat')} style={tabStyle('chat')}>Chat</button>
-      </div>
+        {/* Tab Navigation - Members and Notes only */}
+        <div className="tab-navigation">
+          <button onClick={() => setCurrentTab('classinfo')} className={`tab-btn ${currentTab === 'classinfo' ? 'active' : ''}`}>Class Info</button>
+          <button onClick={() => setCurrentTab('notes')} className={`tab-btn ${currentTab === 'notes' ? 'active' : ''}`}>Notes</button>
+        </div>
 
-      {/* Tab Content */}
-      {currentTab === 'members' && (
-        <div className="card">
-          <h3 style={{ marginBottom: '15px' }}>Team Members ({groupDetails.members?.length || 0})</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {groupDetails.members?.map((member) => (
-              <div key={member.id} style={{ display: 'flex', alignItems: 'center', gap: '15px', padding: '10px', background: '#f9f9fc', borderRadius: '5px' }}>
-                <div style={{ width: '40px', height: '40px', background: '#2c3e50', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
-                  {member.user?.name?.charAt(0).toUpperCase()}
+        {/* Tab Content */}
+        {currentTab === 'classinfo' && (
+          <div className="card">
+            <h3 className="members-heading">Members ({groupDetails.members?.length || 0})</h3>
+            <div className="invite-code-display">
+              Invite Code: <strong className="invite-code">{groupDetails.inviteCode}</strong>
+            </div>
+            <div className="members-list">
+              {groupDetails.members?.map((member) => (
+                <div key={member.id} className="member-item">
+                  <div className="member-avatar">
+                    {member.user?.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <div className="member-name">{member.user?.name}</div>
+                    <div className="member-email">{member.user?.email}</div>
+                  </div>
                 </div>
-                <div>
-                  <div style={{ fontWeight: 'bold' }}>{member.user?.name}</div>
-                  <div style={{ fontSize: '0.9rem', color: '#7f8c8d' }}>{member.user?.email}</div>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            <div style={{ marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid #eee', display: 'flex', gap: '10px' }}>
+              {isEditing ? (
+                <>
+                  <button 
+                    onClick={handleUpdateGroup}
+                    style={{ flex: 1, padding: '10px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+                  >
+                    Save
+                  </button>
+                  <button 
+                    onClick={() => { setIsEditing(false); setEditName(groupDetails.name); setEditClassName(groupDetails.className); }}
+                    style={{ flex: 1, padding: '10px', backgroundColor: '#9ca3af', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button 
+                    onClick={() => setIsEditing(true)}
+                    style={{ flex: 1, padding: '10px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+                  >
+                    Edit Group
+                  </button>
+                  <button 
+                    onClick={handleLeaveGroup}
+                    style={{
+                      flex: 1,
+                      padding: '10px',
+                      backgroundColor: 'transparent',
+                      border: '1px solid #ef4444',
+                      color: '#ef4444',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    Leave Group
+                  </button>
+                </>
+              )}
+            </div>
           </div>
+        )}
+
+        {currentTab === 'notes' && (
+          <SharedNotes groupId={group.id} socket={socket} />
+        )}
+      </div>
+
+      {/* Resizer Handle */}
+      <div 
+        className="resizer-handle" 
+        onMouseDown={startResizing}
+      />
+
+      {/* Right Panel - Chat Area */}
+      <div className="right-panel" style={{ width: sidebarWidth }}>
+        {/* Toggle System */}
+        <div className="chat-toggle-container">
+          <button onClick={() => setChatMode('group')} className={`chat-toggle-btn ${chatMode === 'group' ? 'active' : ''}`}>
+            Group Chat
+          </button>
+          <button onClick={() => setChatMode('ai')} className={`chat-toggle-btn ${chatMode === 'ai' ? 'active' : ''}`}>
+            AI Chat
+          </button>
         </div>
-      )}
 
-      {currentTab === 'notes' && (
-        <SharedNotes groupId={group.id} socket={socket} />
-      )}
-
-      {currentTab === 'chat' && (
-        <ChatComponent groupId={group.id} socket={socket} user={user} />
-      )}
+        {/* Chat Content */}
+        <div className="chat-content-wrapper">
+          {chatMode === 'group' ? (
+            <ChatComponent groupId={group.id} socket={socket} user={user} />
+          ) : (
+            <AiChatComponent />
+          )}
+        </div>
+      </div>
     </div>
   );
 }

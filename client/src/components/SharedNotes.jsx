@@ -81,44 +81,24 @@ export default function SharedNotes({ groupId, socket }) {
   if (loading) return <div>Loading notes...</div>;
 
   return (
-    <div className="card">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-        <h3 style={{ margin: 0 }}>📝 Shared Study Notes</h3>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <span style={{ fontSize: '0.85rem', color: saveStatus === 'All changes saved' ? '#27ae60' : '#e67e22' }}>
+    <div className="card notes-container">
+      <div className="notes-header">
+        <h3 className="notes-title">📝 Shared Study Notes</h3>
+        <div className="notes-controls">
+          <span className={`save-status ${saveStatus === 'All changes saved' ? 'saved' : 'unsaved'}`}>
             {saveStatus}
           </span>
-          <button 
-            onClick={handleSave}
-            style={{ 
-              padding: '8px 16px', 
-              background: '#2ecc71', 
-              color: 'white', 
-              border: 'none', 
-              borderRadius: '4px', 
-              cursor: 'pointer',
-              fontWeight: 'bold'
-            }}
-          >
+          <button onClick={handleSave} className="btn-save">
             Save Now
           </button>
         </div>
       </div>
-      
+
       <textarea
         value={content}
         onChange={handleChange}
         placeholder="Start typing your group notes here..."
-        style={{ 
-          width: '100%', 
-          height: '400px', 
-          padding: '15px', 
-          borderRadius: '8px', 
-          border: '1px solid #ddd', 
-          fontSize: '1rem', 
-          lineHeight: '1.5',
-          boxSizing: 'border-box'
-        }}
+        className="notes-textarea"
       />
     </div>
   );
