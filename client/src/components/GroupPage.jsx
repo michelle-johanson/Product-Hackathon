@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import ChatComponent from './ChatComponent';
 import SharedNotes from './SharedNotes';
 import AiChatComponent from './AiChatComponent';
+import FileSection from './FileSection';
 
 export default function GroupPage({ group, onBack, socket, user, refreshGroups }) {
   const [groupDetails, setGroupDetails] = useState(null);
@@ -161,6 +162,7 @@ export default function GroupPage({ group, onBack, socket, user, refreshGroups }
         <div className="tab-navigation">
           <button onClick={() => setCurrentTab('classinfo')} className={`tab-btn ${currentTab === 'classinfo' ? 'active' : ''}`}>Class Info</button>
           <button onClick={() => setCurrentTab('notes')} className={`tab-btn ${currentTab === 'notes' ? 'active' : ''}`}>Notes</button>
+          <button onClick={() => setCurrentTab('files')} className={`tab-btn ${currentTab === 'files' ? 'active' : ''}`}>Files</button>
         </div>
 
         {/* Tab Content */}
@@ -213,6 +215,10 @@ export default function GroupPage({ group, onBack, socket, user, refreshGroups }
 
         {currentTab === 'notes' && (
           <SharedNotes groupId={group.id} socket={socket} />
+        )}
+
+        {currentTab === 'files' && (
+          <FileSection groupId={group.id} />
         )}
       </div>
 
