@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-const pdfParse = require('pdf-parse');
+const { PDFParse } = require('pdf-parse');
 const auth = require('../middleware/auth');
 
 // Ensure uploads directory exists
@@ -40,6 +40,47 @@ const upload = multer({
     } else {
       cb(new Error('Invalid file type. Only PDF and Markdown files are allowed.'));
     }
+  }
+});
+
+// POST /api/files/backfill/content - Re-extract content for all files with empty content
+// Must be defined BEFORE /:groupId routes to avoid param collision
+router.post('/backfill/content', auth, async (req, res) => {
+  try {
+    const files = await prisma.file.findMany({ where: { content: '' } });
+    let updated = 0;
+
+    for (const file of files) {
+      const filePath = path.join(uploadDir, file.url);
+      if (!fs.existsSync(filePath)) continue;
+
+      let content = '';
+      try {
+        if (file.type === 'PDF') {
+          const dataBuffer = fs.readFileSync(filePath);
+          const parser = new PDFParse({ data: new Uint8Array(dataBuffer), verbosity: 0 });
+          const doc = await parser.load();
+          const textResult = await parser.getText(doc);
+          content = textResult.text || '';
+          await parser.destroy();
+        } else {
+          content = fs.readFileSync(filePath, 'utf-8');
+        }
+      } catch (err) {
+        console.error(`Extraction failed for ${file.name}:`, err.message);
+        continue;
+      }
+
+      if (content) {
+        await prisma.file.update({ where: { id: file.id }, data: { content } });
+        updated++;
+      }
+    }
+
+    res.json({ message: `Backfilled ${updated} of ${files.length} files` });
+  } catch (error) {
+    console.error('Backfill error:', error);
+    res.status(500).json({ error: 'Backfill failed' });
   }
 });
 
@@ -98,8 +139,11 @@ router.post('/:groupId', auth, upload.single('file'), async (req, res) => {
     try {
       if (isPdf) {
         const dataBuffer = fs.readFileSync(filePath);
-        const pdfData = await pdfParse(dataBuffer);
-        content = pdfData.text;
+        const parser = new PDFParse({ data: new Uint8Array(dataBuffer), verbosity: 0 });
+        const doc = await parser.load();
+        const textResult = await parser.getText(doc);
+        content = textResult.text || '';
+        await parser.destroy();
       } else {
         content = fs.readFileSync(filePath, 'utf-8');
       }
