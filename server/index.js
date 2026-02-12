@@ -90,7 +90,7 @@ wss.on('connection', (ws, req) => {
         await prisma.note.upsert({
           where: { groupId: parseInt(groupId) },
           update: { content: content, lastEditedBy: userId },
-          create: { groupId: parseInt(groupId), content: content, lastEditedBy: userId }
+          create: { groupId: parseInt(groupId), title: 'Shared Notes', content: content, lastEditedBy: userId }
         });
 
         // 2. Broadcast to other members in the room
