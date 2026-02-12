@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 router.get('/:groupId', authMiddleware, async (req, res) => {
   try {
     const { groupId } = req.params;
-    let note = await prisma.note.findUnique({
+    let note = await prisma.note.findFirst({
       where: { groupId: parseInt(groupId) }
     });
     if (!note) {
@@ -29,11 +29,10 @@ router.post('/:groupId', authMiddleware, async (req, res) => {
     const { content } = req.body;
     const userId = req.user.id; // From authMiddleware
 
-    const note = await prisma.note.upsert({
-      where: { groupId: parseInt(groupId) },
-      update: { content, lastEditedBy: userId },
-      create: { groupId: parseInt(groupId), title: 'Shared Notes', content, lastEditedBy: userId }
-    });
+    let existing = await prisma.note.findFirst({ where: { groupId: parseInt(groupId) } });
+    const note = existing
+      ? await prisma.note.update({ where: { id: existing.id }, data: { content, lastEditedBy: userId } })
+      : await prisma.note.create({ data: { groupId: parseInt(groupId), title: 'Shared Notes', content, lastEditedBy: userId } });
     res.json(note);
   } catch (err) {
     console.error("Save error:", err);
