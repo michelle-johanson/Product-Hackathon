@@ -119,52 +119,52 @@ if (view === 'menu') {
 
   if (view === 'add_group') {
     return (
-      <div style={{ padding: '50px', maxWidth: '400px', margin: '0 auto' }}>
-        <button onClick={() => setView('menu')}>← Back to Menu</button>
-        
-        <div style={{ marginBottom: '40px' }}>
+      <div className="dashboard-form-centered">
+        <button className="back-button" onClick={() => setView('menu')}>← Back to Menu</button>
+
+        <div className="dashboard-section">
           <h2>Create a New Group</h2>
           <form onSubmit={handleCreateGroup}>
-            <div style={{ marginBottom: '15px' }}>
-              <label>Group Name</label><br/>
-              <input 
-                style={{ width: '100%', padding: '8px' }}
+            <div className="form-group">
+              <label className="form-label">Group Name</label>
+              <input
+                className="form-input"
                 value={groupName}
                 onChange={e => setGroupName(e.target.value)}
                 required
               />
             </div>
-            <div style={{ marginBottom: '15px' }}>
-              <label>Class Name</label><br/>
-              <input 
-                style={{ width: '100%', padding: '8px' }}
+            <div className="form-group">
+              <label className="form-label">Class Name</label>
+              <input
+                className="form-input"
                 value={className}
                 onChange={e => setClassName(e.target.value)}
                 required
               />
             </div>
-            <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#4CAF50', color: 'white', border: 'none', cursor: 'pointer' }}>
+            <button type="submit" className="btn-save-green">
               Create Group
             </button>
           </form>
         </div>
 
-        <hr />
+        <hr className="form-divider" />
 
-        <div style={{ marginTop: '40px' }}>
+        <div className="dashboard-section-gap">
           <h2>OR Join Existing Group</h2>
           <form onSubmit={handleJoinGroup}>
-            <div style={{ marginBottom: '15px' }}>
-              <label>Enter Invite Code</label><br/>
-              <input 
-                style={{ width: '100%', padding: '8px' }}
+            <div className="form-group">
+              <label className="form-label">Enter Invite Code</label>
+              <input
+                className="form-input"
                 placeholder="e.g. x7z9q2"
                 value={joinCode}
                 onChange={e => setJoinCode(e.target.value)}
                 required
               />
             </div>
-            <button type="submit" style={{ padding: '10px 20px', backgroundColor: '#008CBA', color: 'white', border: 'none', cursor: 'pointer' }}>
+            <button type="submit" className="btn-join">
               Join Group
             </button>
           </form>
@@ -175,8 +175,8 @@ if (view === 'menu') {
 
   if (view === 'view_groups') {
     return (
-      <div style={{ padding: '50px', maxWidth: '600px', margin: '0 auto' }}>
-        <button onClick={() => setView('menu')}>← Back to Menu</button>
+      <div className="group-list-centered">
+        <button className="back-button" onClick={() => setView('menu')}>← Back to Menu</button>
         <h2>My Study Groups</h2>
 
         {loadingGroups ? (
@@ -184,21 +184,13 @@ if (view === 'menu') {
         ) : groups.length === 0 ? (
           <p>You haven't joined any groups yet.</p>
         ) : (
-          <div style={{ display: 'grid', gap: '15px' }}>
+          <div className="group-grid">
             {groups.map(group => (
-              <div 
-                key={group.id}
-                style={{ 
-                  border: '1px solid #ccc', 
-                  padding: '15px', 
-                  borderRadius: '8px',
-                  backgroundColor: '#f9f9f9'
-                }}
-              >
-                <h3 style={{ margin: '0 0 5px 0' }}>{group.name}</h3>
-                <p style={{ margin: '0', color: '#666' }}>{group.className}</p>
-                <div style={{ marginTop: '10px', fontSize: '14px', color: '#888' }}>
-                  Members: {group._count.members} • Invite Code: <b style={{ background: '#eee', padding: '2px 5px' }}>{group.inviteCode}</b>
+              <div key={group.id} className="group-card">
+                <h3 className="group-card-title">{group.name}</h3>
+                <p className="group-card-subtitle">{group.className}</p>
+                <div className="group-card-meta">
+                  Members: {group._count.members} • Invite Code: <b className="invite-badge">{group.inviteCode}</b>
                 </div>
               </div>
             ))}
