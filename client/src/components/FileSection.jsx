@@ -1,14 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import FilePreviewModal from './FilePreviewModal';
 
 export default function FileSection({ groupId }) {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [previewFile, setPreviewFile] = useState(null);
 
-  const fetchFiles = async () => {
+  const fetchFiles = useCallback(async (search = '') => {
     const token = localStorage.getItem('token');
+    const params = search ? `?search=${encodeURIComponent(search)}` : '';
     try {
-      const res = await fetch(`http://localhost:3000/api/files/${groupId}`, {
+      const res = await fetch(`http://localhost:3000/api/files/${groupId}${params}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -20,17 +24,24 @@ export default function FileSection({ groupId }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [groupId]);
 
   useEffect(() => {
     fetchFiles();
-  }, [groupId]);
+  }, [fetchFiles]);
+
+  // Debounce search requests
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchFiles(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery, fetchFiles]);
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate type
     if (file.type !== 'application/pdf' && !file.name.endsWith('.md')) {
       alert('Only PDF and Markdown (.md) files are allowed.');
       return;
@@ -44,15 +55,12 @@ export default function FileSection({ groupId }) {
     try {
       const res = await fetch(`http://localhost:3000/api/files/${groupId}`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-          // Note: Content-Type is automatically set by browser for FormData
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
         body: formData
       });
 
       if (res.ok) {
-        await fetchFiles(); // Refresh list
+        await fetchFiles(searchQuery);
       } else {
         alert('Failed to upload file');
       }
@@ -61,7 +69,27 @@ export default function FileSection({ groupId }) {
       alert('Network error during upload');
     } finally {
       setUploading(false);
-      e.target.value = null; // Reset input
+      e.target.value = null;
+    }
+  };
+
+  const handleDelete = async (fileId, fileName) => {
+    if (!window.confirm(`Delete "${fileName}"? This cannot be undone.`)) return;
+
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`http://localhost:3000/api/files/${fileId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        await fetchFiles(searchQuery);
+      } else {
+        alert('Failed to delete file');
+      }
+    } catch (err) {
+      console.error("Delete error", err);
+      alert('Network error during delete');
     }
   };
 
@@ -83,22 +111,53 @@ export default function FileSection({ groupId }) {
         </div>
       </div>
 
+      <input
+        type="text"
+        className="form-input file-search-input"
+        placeholder="Deep search files by name or content..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+
       <div className="file-list">
-        {loading ? <p>Loading files...</p> : files.length === 0 ? <p className="chat-empty">No files uploaded yet.</p> : files.map(file => (
-          <div key={file.id} className="file-item">
-            <div className="file-info">
-              <span className="file-icon">{file.type === 'PDF' ? '📄' : '📝'}</span>
-              <div className="file-meta">
-                <span className="file-name">{file.name}</span>
-                <span className="file-uploader">Uploaded by {file.user?.name} • {new Date(file.createdAt).toLocaleDateString()}</span>
+        {loading ? (
+          <p>Loading files...</p>
+        ) : files.length === 0 ? (
+          <p className="chat-empty">
+            {searchQuery ? 'No files match your search.' : 'No files uploaded yet.'}
+          </p>
+        ) : (
+          files.map(file => (
+            <div key={file.id} className={`file-item ${file.contentMatch ? 'file-item-content-match' : ''}`}>
+              <div className="file-info">
+                <span className="file-icon">{file.type === 'PDF' ? '📄' : '📝'}</span>
+                <div className="file-meta">
+                  <span className="file-name">
+                    {file.name}
+                    {file.contentMatch && <span className="content-match-badge">Content match</span>}
+                  </span>
+                  <span className="file-uploader">Uploaded by {file.user?.name} • {new Date(file.createdAt).toLocaleDateString()}</span>
+                </div>
+              </div>
+              <div className="file-actions">
+                <button className="btn-file-action btn-preview" onClick={() => setPreviewFile(file)}>
+                  Preview
+                </button>
+                <a href={`http://localhost:3000/uploads/${file.url}`} target="_blank" rel="noreferrer" className="btn-file-action btn-download" download>
+                  Download
+                </a>
+                <button className="btn-file-action btn-delete-file" onClick={() => handleDelete(file.id, file.name)}>
+                  Delete
+                </button>
               </div>
             </div>
-            <a href={`http://localhost:3000/uploads/${file.url}`} target="_blank" rel="noreferrer" className="btn-download" download>
-              Download
-            </a>
-          </div>
-        ))}
+          ))
+        )}
       </div>
+
+      {previewFile && (
+        <FilePreviewModal file={previewFile} onClose={() => setPreviewFile(null)} />
+      )}
     </div>
   );
 }
