@@ -37,61 +37,37 @@ export default function GroupPage({ group, onBack, socket, user }) {
   if (loading) return <div className="p-6">Loading group info...</div>;
   if (!groupDetails) return <div className="p-6">Failed to load group.</div>;
 
-  const tabStyle = (tabName) => ({
-    padding: '12px 20px',
-    background: currentTab === tabName ? '#3498db' : 'transparent',
-    color: currentTab === tabName ? 'white' : '#666',
-    border: 'none',
-    borderBottom: currentTab === tabName ? '3px solid #3498db' : 'none',
-    fontWeight: currentTab === tabName ? 'bold' : 'normal',
-    cursor: 'pointer',
-    fontSize: '1rem',
-    transition: 'all 0.2s'
-  });
-
-  const toggleButtonStyle = (mode) => ({
-    flex: 1,
-    padding: '10px 15px',
-    background: chatMode === mode ? '#3498db' : '#f4f4f9',
-    color: chatMode === mode ? 'white' : '#666',
-    border: 'none',
-    cursor: 'pointer',
-    fontWeight: chatMode === mode ? 'bold' : 'normal',
-    transition: 'all 0.2s',
-    fontSize: '0.95rem'
-  });
-
   return (
-    <div style={{ display: 'flex', height: '100%' }}>
+    <div className="group-page-container">
       {/* Center Content Area */}
       <div className="center-content">
-        <div className="card" style={{ marginBottom: '20px', borderTop: '5px solid #3498db' }}>
-          <h2 style={{ fontSize: '2rem', marginBottom: '5px' }}>{groupDetails.name}</h2>
-          <p style={{ color: '#666', fontSize: '1.1rem', marginBottom: '15px' }}>Class: {groupDetails.className}</p>
+        <div className="card group-header-card">
+          <h2 className="group-title">{groupDetails.name}</h2>
+          <p className="group-subtitle">Class: {groupDetails.className}</p>
         </div>
 
         {/* Tab Navigation - Members and Notes only */}
-        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', borderBottom: '2px solid #eee' }}>
-          <button onClick={() => setCurrentTab('classinfo')} style={tabStyle('classinfo')}>Class Info</button>
-          <button onClick={() => setCurrentTab('notes')} style={tabStyle('notes')}>Notes</button>
+        <div className="tab-navigation">
+          <button onClick={() => setCurrentTab('classinfo')} className={`tab-btn ${currentTab === 'classinfo' ? 'active' : ''}`}>Class Info</button>
+          <button onClick={() => setCurrentTab('notes')} className={`tab-btn ${currentTab === 'notes' ? 'active' : ''}`}>Notes</button>
         </div>
 
         {/* Tab Content */}
         {currentTab === 'classinfo' && (
           <div className="card">
-            <h3 style={{ marginBottom: '10px' }}>Members ({groupDetails.members?.length || 0})</h3>
-            <div style={{ background: '#f4f4f9', padding: '10px', borderRadius: '5px', display: 'inline-block', marginBottom: '15px' }}>
-              Invite Code: <strong style={{ letterSpacing: '2px', fontSize: '1.1rem' }}>{groupDetails.inviteCode}</strong>
+            <h3 className="members-heading">Members ({groupDetails.members?.length || 0})</h3>
+            <div className="invite-code-display">
+              Invite Code: <strong className="invite-code">{groupDetails.inviteCode}</strong>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div className="members-list">
               {groupDetails.members?.map((member) => (
-                <div key={member.id} style={{ display: 'flex', alignItems: 'center', gap: '15px', padding: '10px', background: '#f9f9fc', borderRadius: '5px' }}>
-                  <div style={{ width: '40px', height: '40px', background: '#2c3e50', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                <div key={member.id} className="member-item">
+                  <div className="member-avatar">
                     {member.user?.name?.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <div style={{ fontWeight: 'bold' }}>{member.user?.name}</div>
-                    <div style={{ fontSize: '0.9rem', color: '#7f8c8d' }}>{member.user?.email}</div>
+                    <div className="member-name">{member.user?.name}</div>
+                    <div className="member-email">{member.user?.email}</div>
                   </div>
                 </div>
               ))}
@@ -107,17 +83,17 @@ export default function GroupPage({ group, onBack, socket, user }) {
       {/* Right Panel - Chat Area */}
       <div className="right-panel">
         {/* Toggle System */}
-        <div style={{ display: 'flex', padding: '15px', borderBottom: '1px solid #ddd' }}>
-          <button onClick={() => setChatMode('group')} style={toggleButtonStyle('group')}>
+        <div className="chat-toggle-container">
+          <button onClick={() => setChatMode('group')} className={`chat-toggle-btn ${chatMode === 'group' ? 'active' : ''}`}>
             Group Chat
           </button>
-          <button onClick={() => setChatMode('ai')} style={toggleButtonStyle('ai')}>
+          <button onClick={() => setChatMode('ai')} className={`chat-toggle-btn ${chatMode === 'ai' ? 'active' : ''}`}>
             AI Chat
           </button>
         </div>
 
         {/* Chat Content */}
-        <div style={{ flex: 1, overflow: 'hidden' }}>
+        <div className="chat-content-wrapper">
           {chatMode === 'group' ? (
             <ChatComponent groupId={group.id} socket={socket} user={user} />
           ) : (
