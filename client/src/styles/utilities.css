@@ -1,0 +1,81 @@
+/* ============================================
+   UTILITIES.CSS - Essential Utility Classes
+   ============================================ */
+
+/* ===== Flexbox Utilities ===== */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-10 {
+  gap: 10px;
+}
+
+.gap-15 {
+  gap: 15px;
+}
+
+/* ===== Spacing Utilities ===== */
+.mb-10 {
+  margin-bottom: 10px;
+}
+
+.mb-15 {
+  margin-bottom: 15px;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.mt-auto {
+  margin-top: auto;
+}
+
+.pt-20 {
+  padding-top: 20px;
+}
+
+/* ===== Text Utilities ===== */
+.text-bold {
+  font-weight: bold;
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* ===== Display Utilities ===== */
+.block {
+  display: block;
+}
+
+.hidden {
+  display: none;
+}

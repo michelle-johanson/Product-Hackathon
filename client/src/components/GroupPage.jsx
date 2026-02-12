@@ -130,12 +130,12 @@ export default function GroupPage({ group, onBack, socket, user, refreshGroups }
   if (!groupDetails) return <div className="p-6">Failed to load group.</div>;
 
   return (
-    <div className="group-page-container" style={{ width: '100%', height: '100%', padding: 0, margin: 0 }}>
+    <div className="group-page-container group-page-full">
       {/* Center Content Area */}
-      <div className="center-content" style={{ padding: '20px' }}>
+      <div className="center-content center-content-padded">
         <div className="card group-header-card">
           {isEditing ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div className="edit-form">
               <input 
                 className="form-input"
                 value={editName}
@@ -184,43 +184,25 @@ export default function GroupPage({ group, onBack, socket, user, refreshGroups }
               ))}
             </div>
 
-            <div style={{ marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid #eee', display: 'flex', gap: '10px' }}>
+            <div className="group-actions">
               {isEditing ? (
                 <>
-                  <button 
-                    onClick={handleUpdateGroup}
-                    style={{ flex: 1, padding: '10px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
-                  >
+                  <button className="btn-save-green" onClick={handleUpdateGroup}>
                     Save
                   </button>
-                  <button 
+                  <button
+                    className="btn-cancel-gray"
                     onClick={() => { setIsEditing(false); setEditName(groupDetails.name); setEditClassName(groupDetails.className); }}
-                    style={{ flex: 1, padding: '10px', backgroundColor: '#9ca3af', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
                   >
                     Cancel
                   </button>
                 </>
               ) : (
                 <>
-                  <button 
-                    onClick={() => setIsEditing(true)}
-                    style={{ flex: 1, padding: '10px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
-                  >
+                  <button className="btn-edit-blue" onClick={() => setIsEditing(true)}>
                     Edit Group
                   </button>
-                  <button 
-                    onClick={handleLeaveGroup}
-                    style={{
-                      flex: 1,
-                      padding: '10px',
-                      backgroundColor: 'transparent',
-                      border: '1px solid #ef4444',
-                      color: '#ef4444',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      fontWeight: 'bold'
-                    }}
-                  >
+                  <button className="btn-leave-red" onClick={handleLeaveGroup}>
                     Leave Group
                   </button>
                 </>

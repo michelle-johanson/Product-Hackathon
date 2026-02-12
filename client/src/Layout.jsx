@@ -18,16 +18,16 @@ export default function Layout({ children, user, onLogout, groups, currentGroup,
           </button>
         </div>
 
-        <nav style={{ flex: 1, overflowY: 'auto' }}>
-          <div 
-            className={`sidebar-link ${!currentGroup ? 'active' : ''}`} 
+        <nav className="nav-scrollable">
+          <div
+            className={`sidebar-link ${!currentGroup ? 'active' : ''}`}
             onClick={() => onSelectGroup(null)}
           >
             {sidebarOpen ? '🏠 Dashboard' : '🏠'}
           </div>
 
           {sidebarOpen && (
-            <div style={{ margin: '25px 0 10px 10px', fontSize: '0.75rem', color: '#888', textTransform: 'uppercase', letterSpacing: '1px' }}>
+            <div className="nav-section-label">
               My Groups
             </div>
           )}
@@ -54,12 +54,7 @@ export default function Layout({ children, user, onLogout, groups, currentGroup,
       <div className="main-content">
         <header className="top-header">
           <h2>{`Welcome, ${user.name}!`}</h2>
-          <div style={{ 
-            width: '35px', height: '35px', 
-            background: '#3498db', color: 'white', 
-            borderRadius: '50%', display: 'flex', 
-            alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' 
-          }}>
+          <div className="user-avatar">
             {user.name.charAt(0).toUpperCase()}
           </div>
         </header>

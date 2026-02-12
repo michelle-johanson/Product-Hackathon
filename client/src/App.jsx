@@ -40,8 +40,8 @@ const AccountSettings = ({ user, onLogout, onDeleteAccount, onUpdateProfile }) =
     <div className="dashboard-container">
       <h2 className="dashboard-heading">Account Settings</h2>
 
-      <div className="card" style={{ marginBottom: '20px' }}>
-        <h3 style={{ marginBottom: '15px' }}>Profile Information</h3>
+      <div className="card settings-section">
+        <h3 className="settings-field">Profile Information</h3>
         {error && <p className="auth-error">{error}</p>}
 
         {isEditing ? (
@@ -65,14 +65,13 @@ const AccountSettings = ({ user, onLogout, onDeleteAccount, onUpdateProfile }) =
                 required
               />
             </div>
-            <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
-              <button type="submit" className="btn-create" style={{ flex: 1 }}>
+            <div className="button-group-mt">
+              <button type="submit" className="btn-create btn-flex-full">
                 Save Changes
               </button>
               <button
                 type="button"
-                className="btn-secondary"
-                style={{ flex: 1 }}
+                className="btn-secondary btn-flex-full"
                 onClick={() => {
                   setIsEditing(false);
                   setEditName(user.name);
@@ -86,13 +85,13 @@ const AccountSettings = ({ user, onLogout, onDeleteAccount, onUpdateProfile }) =
           </form>
         ) : (
           <>
-            <div style={{ marginBottom: '15px' }}>
-              <div style={{ color: '#666', fontSize: '0.9rem' }}>Name</div>
-              <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>{user.name}</div>
+            <div className="settings-field">
+              <div className="settings-label">Name</div>
+              <div className="settings-value">{user.name}</div>
             </div>
-            <div style={{ marginBottom: '15px' }}>
-              <div style={{ color: '#666', fontSize: '0.9rem' }}>Email</div>
-              <div style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>{user.email}</div>
+            <div className="settings-field">
+              <div className="settings-label">Email</div>
+              <div className="settings-value">{user.email}</div>
             </div>
             <button
               className="btn-primary"
@@ -104,38 +103,14 @@ const AccountSettings = ({ user, onLogout, onDeleteAccount, onUpdateProfile }) =
         )}
       </div>
 
-      <div className="card" style={{ borderTop: '3px solid #e74c3c' }}>
-        <h3 style={{ marginBottom: '15px', color: '#e74c3c' }}>Danger Zone</h3>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <button
-            className="layout-logout-btn"
-            onClick={onLogout}
-            style={{
-              padding: '10px 20px',
-              justifyContent: 'center',
-              border: '1px solid #ff6b6b',
-              borderRadius: '5px'
-            }}
-          >
+      <div className="card danger-zone-card">
+        <h3 className="danger-zone-heading">Danger Zone</h3>
+        <div className="danger-zone-actions">
+          <button className="btn-logout-settings" onClick={onLogout}>
             <span>🚪</span>
             <span>Log Out</span>
           </button>
-          <button
-            onClick={handleDeleteAccount}
-            style={{
-              padding: '10px 20px',
-              background: '#e74c3c',
-              color: 'white',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '10px'
-            }}
-          >
+          <button className="btn-delete-account" onClick={handleDeleteAccount}>
             <span>🗑️</span>
             <span>Delete Account</span>
           </button>
@@ -177,19 +152,11 @@ const Layout = ({ children, user, groups, currentGroup, onSelectGroup, onOpenCre
           ))}
         </nav>
 
-        <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', paddingTop: '20px', borderTop: '1px solid #34495e' }}>
-          <button
-            onClick={onOpenCreateModal}
-            className="sidebar-link"
-            style={{ justifyContent: sidebarOpen ? 'flex-start' : 'center', background: '#27ae60', color: 'white' }}
-          >
+        <div className="sidebar-action-buttons">
+          <button onClick={onOpenCreateModal} className="sidebar-create-btn">
             {sidebarOpen ? '+ Create Group' : '+'}
           </button>
-          <button
-            onClick={onOpenJoinModal}
-            className="sidebar-link"
-            style={{ justifyContent: sidebarOpen ? 'flex-start' : 'center', background: '#3498db', color: 'white' }}
-          >
+          <button onClick={onOpenJoinModal} className="sidebar-join-btn">
             {sidebarOpen ? '🔗 Join Group' : '🔗'}
           </button>
         </div>
@@ -203,9 +170,10 @@ const Layout = ({ children, user, groups, currentGroup, onSelectGroup, onOpenCre
           </div>
         </header>
 
-        <main className="layout-content" style={{ padding: 0, margin: 0 }}>
+        <main className={currentGroup && currentGroup !== 'settings' ? 'layout-content-flush' : 'layout-content'}>
           {children}
         </main>
+
       </div>
     </div>
   );
@@ -216,35 +184,12 @@ const Modal = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000
-    }}>
-      <div className="form-container" style={{ maxWidth: '500px', position: 'relative' }}>
-        <button
-          onClick={onClose}
-          style={{
-            position: 'absolute',
-            top: '10px',
-            right: '10px',
-            background: 'none',
-            border: 'none',
-            fontSize: '1.5rem',
-            cursor: 'pointer',
-            color: '#666'
-          }}
-        >
+    <div className="modal-overlay">
+      <div className="modal-content">
+        <button className="modal-close-btn" onClick={onClose}>
           ×
         </button>
-        <h2 style={{ marginBottom: '20px' }}>{title}</h2>
+        <h2 className="modal-title">{title}</h2>
         {children}
       </div>
     </div>
