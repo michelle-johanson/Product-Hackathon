@@ -135,7 +135,7 @@ const Layout = ({ children, user, onLogout, groups, currentGroup, onSelectGroup 
 
       <div className="layout-main">
         <header className="layout-header">
-          <h2 className="layout-header-title">{currentGroup ? currentGroup.name : `Welcome, ${user.name}`}</h2>
+          <h2 className="layout-header-title">Welcome, {user.name}!</h2>
           <div className="user-avatar">
             {user.name.charAt(0).toUpperCase()}
           </div>
@@ -283,6 +283,7 @@ export default function App() {
             onBack={() => setCurrentGroup(null)}
             socket={socket}
             user={user}
+            refreshGroups={fetchGroups}
           />
         ) : (
           <Dashboard

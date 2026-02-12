@@ -3,11 +3,14 @@ import ChatComponent from './ChatComponent';
 import SharedNotes from './SharedNotes';
 import AiChatComponent from './AiChatComponent';
 
-export default function GroupPage({ group, onBack, socket, user }) {
+export default function GroupPage({ group, onBack, socket, user, refreshGroups }) {
   const [groupDetails, setGroupDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentTab, setCurrentTab] = useState('classinfo');
   const [chatMode, setChatMode] = useState('group'); // 'group' or 'ai'
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editClassName, setEditClassName] = useState('');
 
   useEffect(() => {
     if (!group || !group.id) return;
@@ -33,6 +36,62 @@ export default function GroupPage({ group, onBack, socket, user }) {
     fetchGroupDetails();
   }, [group?.id]);
 
+  useEffect(() => {
+    if (groupDetails) {
+      setEditName(groupDetails.name);
+      setEditClassName(groupDetails.className);
+    }
+  }, [groupDetails]);
+
+  const handleUpdateGroup = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:3000/api/groups/${group.id}`, {
+        method: 'PATCH',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({ name: editName, className: editClassName })
+      });
+
+      if (res.ok) {
+        const updated = await res.json();
+        setGroupDetails(prev => ({ ...prev, name: updated.name, className: updated.className }));
+        if (refreshGroups) refreshGroups();
+        setIsEditing(false);
+      } else {
+        alert("Failed to update group.");
+      }
+    } catch (err) {
+      console.error("Error updating group:", err);
+      alert("Network error.");
+    }
+  };
+
+  const handleLeaveGroup = async () => {
+    const confirmed = window.confirm("Are you sure you want to leave this group? If you are the last member, the group and all notes will be permanently deleted.");
+    if (!confirmed) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:3000/api/groups/${group.id}/leave`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (res.ok) {
+        if (refreshGroups) refreshGroups();
+        onBack();
+      } else {
+        alert("Failed to leave group. Please try again.");
+      }
+    } catch (err) {
+      console.error("Error leaving group:", err);
+      alert("Network error occurred.");
+    }
+  };
+
   if (!group) return <div className="p-6">No group selected.</div>;
   if (loading) return <div className="p-6">Loading group info...</div>;
   if (!groupDetails) return <div className="p-6">Failed to load group.</div>;
@@ -42,8 +101,27 @@ export default function GroupPage({ group, onBack, socket, user }) {
       {/* Center Content Area */}
       <div className="center-content">
         <div className="card group-header-card">
-          <h2 className="group-title">{groupDetails.name}</h2>
-          <p className="group-subtitle">Class: {groupDetails.className}</p>
+          {isEditing ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <input 
+                className="form-input"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                placeholder="Group Name"
+              />
+              <input 
+                className="form-input"
+                value={editClassName}
+                onChange={(e) => setEditClassName(e.target.value)}
+                placeholder="Class Name"
+              />
+            </div>
+          ) : (
+            <>
+              <h2 className="group-title">{groupDetails.name}</h2>
+              <p className="group-subtitle">Class: {groupDetails.className}</p>
+            </>
+          )}
         </div>
 
         {/* Tab Navigation - Members and Notes only */}
@@ -71,6 +149,49 @@ export default function GroupPage({ group, onBack, socket, user }) {
                   </div>
                 </div>
               ))}
+            </div>
+
+            <div style={{ marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid #eee', display: 'flex', gap: '10px' }}>
+              {isEditing ? (
+                <>
+                  <button 
+                    onClick={handleUpdateGroup}
+                    style={{ flex: 1, padding: '10px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+                  >
+                    Save
+                  </button>
+                  <button 
+                    onClick={() => { setIsEditing(false); setEditName(groupDetails.name); setEditClassName(groupDetails.className); }}
+                    style={{ flex: 1, padding: '10px', backgroundColor: '#9ca3af', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button 
+                    onClick={() => setIsEditing(true)}
+                    style={{ flex: 1, padding: '10px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+                  >
+                    Edit Group
+                  </button>
+                  <button 
+                    onClick={handleLeaveGroup}
+                    style={{
+                      flex: 1,
+                      padding: '10px',
+                      backgroundColor: 'transparent',
+                      border: '1px solid #ef4444',
+                      color: '#ef4444',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    Leave Group
+                  </button>
+                </>
+              )}
             </div>
           </div>
         )}
