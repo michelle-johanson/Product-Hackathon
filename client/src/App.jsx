@@ -110,15 +110,32 @@ const Layout = ({ children, user, groups, currentGroup, onSelectGroup, onNavigat
   );
 };
 
+// --- Updated Account Settings Component ---
 const AccountSettings = ({ user, onLogout, onDeleteAccount }) => {
   return (
-    <div style={{ padding: '60px', textAlign: 'center' }}>
-      <h2 className="mgmt-heading">Account Settings</h2>
-      <div className="mgmt-form" style={{ maxWidth: '400px', margin: '0 auto' }}>
-        <p style={{ fontSize: '1.2rem', marginBottom: '10px' }}><strong>User:</strong> {user.name}</p>
-        <p style={{ color: '#666', marginBottom: '30px' }}>{user.email}</p>
-        <button className="mgmt-submit-btn" onClick={onLogout}>Log Out</button>
-        <button className="mgmt-submit-btn" style={{ background: '#e74c3c', color: 'white' }} onClick={onDeleteAccount}>Delete Account</button>
+    <div className="settings-container">
+      <h1 className="settings-heading">Account Settings</h1>
+      
+      <div className="settings-card">
+        <div className="settings-group">
+          <label className="settings-label">Name</label>
+          <div className="settings-value">{user.name}</div>
+        </div>
+        <div className="settings-group">
+          <label className="settings-label">Email</label>
+          <div className="settings-value">{user.email}</div>
+        </div>
+      </div>
+
+      <hr className="settings-divider" />
+
+      <div className="settings-buttons">
+        <button className="btn-action-yellow settings-btn" onClick={onLogout}>
+          Sign Out
+        </button>
+        <button className="btn-action-danger" onClick={onDeleteAccount}>
+          Delete Account
+        </button>
       </div>
     </div>
   );
@@ -230,6 +247,13 @@ export default function App() {
     setUser(null);
   };
 
+  const handleDeleteAccount = () => {
+    if(confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+      // Placeholder for future backend implementation
+      alert("Account deletion will be available soon.");
+    }
+  };
+
   if (loading) return <h1>Loading...</h1>;
 
   if (user) {
@@ -243,7 +267,7 @@ export default function App() {
         onNavigateSettings={() => { setView('settings'); setCurrentGroup(null); }}
       >
         {view === 'settings' ? (
-          <AccountSettings user={user} onLogout={handleLogout} />
+          <AccountSettings user={user} onLogout={handleLogout} onDeleteAccount={handleDeleteAccount} />
         ) : view === 'mgmt' ? (
           <GroupManagement 
             groupName={groupName} setGroupName={setGroupName}
