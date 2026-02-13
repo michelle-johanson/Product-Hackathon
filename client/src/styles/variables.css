@@ -1,22 +1,42 @@
 /* ============================================
-   CSS CUSTOM PROPERTIES (Design Tokens)
+   VARIABLES.CSS - Design Tokens (Updated)
    ============================================ */
 
 :root {
-  /* ===== Background Colors ===== */
+  /* ===== NEW FIGMA TOKENS ===== */
+  --color-auth-input-bg: #d9d9d9;  /* Grey pill background */
+  --color-auth-btn-yellow: #ffdb4d; /* Yellow button */
+  --radius-pill: 25px;
+  --radius-btn-auth: 20px;
+
+  /* ===== EXISTING TOKENS (Keep these so the dashboard works) ===== */
+  --color-bg-app: #f4f4f9;
+  --color-bg-surface: #ffffff;
+  --color-primary: #3498db;
+  --color-primary-hover: #2980b9;
+  --color-text-primary: #333333;
+  --color-text-secondary: #666666;
+  --color-danger: #e74c3c;
+  --color-danger-bg: #ffe8e8;
+  --color-danger-border: #e8e8e8;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  /* ===== EXISTING Background Colors (Kept) ===== */
   --color-bg-app: #f4f4f9;
   --color-bg-surface: #ffffff;
   --color-bg-surface-hover: #f9f9fc;
   --color-bg-muted: #fafafa;
   --color-bg-elevated: #f0f0f0;
 
-  /* ===== Sidebar ===== */
+  /* ===== EXISTING Sidebar (Kept) ===== */
   --color-sidebar-bg: #2c3e50;
   --color-sidebar-hover: #34495e;
   --color-sidebar-border: #34495e;
   --color-sidebar-text: #bdc3c7;
 
-  /* ===== Text Colors ===== */
+  /* ===== EXISTING Text Colors (Kept) ===== */
   --color-text-primary: #333333;
   --color-text-secondary: #666666;
   --color-text-muted: #888888;
@@ -24,14 +44,14 @@
   --color-text-lighter: #bbbbbb;
   --color-text-heading: #2c3e50;
 
-  /* ===== Border Colors ===== */
+  /* ===== EXISTING Border Colors (Kept) ===== */
   --color-border-light: #eeeeee;
   --color-border-default: #dddddd;
   --color-border-medium: #cccccc;
   --color-border-dark: #555555;
   --color-border-message: #bdc3c7;
 
-  /* ===== Primary/Brand (Blue) ===== */
+  /* ===== EXISTING Primary/Brand (Blue) (Kept) ===== */
   --color-primary: #3498db;
   --color-primary-hover: #2980b9;
   --color-primary-light: #ebf5fb;
@@ -39,18 +59,18 @@
   --color-primary-alt: #3b82f6;
   --color-primary-legacy: #008CBA;
 
-  /* ===== Success (Green) ===== */
+  /* ===== EXISTING Success (Green) (Kept) ===== */
   --color-success: #2ecc71;
   --color-success-hover: #27ae60;
   --color-success-dark: #229954;
   --color-success-text: #27ae60;
   --color-success-legacy: #4CAF50;
 
-  /* ===== Warning (Orange) ===== */
+  /* ===== EXISTING Warning (Orange) (Kept) ===== */
   --color-warning: #f39c12;
   --color-warning-text: #e67e22;
 
-  /* ===== Danger (Red) ===== */
+  /* ===== EXISTING Danger (Red) (Kept) ===== */
   --color-danger: #e74c3c;
   --color-danger-hover: #c0392b;
   --color-danger-bg: #ffe8e8;
@@ -59,25 +79,25 @@
   --color-danger-light: #ff6b6b;
   --color-danger-lightest: #fff5f5;
 
-  /* ===== Neutral/Gray ===== */
+  /* ===== EXISTING Neutral/Gray (Kept) ===== */
   --color-gray-medium: #7f8c8d;
   --color-gray-light: #9ca3af;
   --color-disabled: #bdc3c7;
 
-  /* ===== Border Radius ===== */
+  /* ===== EXISTING Border Radius (Kept) ===== */
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
   --radius-xl: 12px;
   --radius-full: 50%;
 
-  /* ===== Shadows ===== */
+  /* ===== EXISTING Shadows (Kept) ===== */
   --shadow-subtle: 0 2px 4px rgba(0, 0, 0, 0.05);
   --shadow-medium: 0 2px 5px rgba(0, 0, 0, 0.1);
   --shadow-strong: 0 10px 40px rgba(0, 0, 0, 0.2);
   --shadow-chat: 0 2px 8px rgba(0, 0, 0, 0.1);
 
-  /* ===== Transitions ===== */
+  /* ===== EXISTING Transitions (Kept) ===== */
   --transition-fast: 0.2s ease;
   --transition-medium: 0.3s ease;
   --transition-bg: background 0.2s;

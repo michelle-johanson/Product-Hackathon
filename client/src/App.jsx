@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import GroupPage from './components/GroupPage';
+import struggleBusLogo from './assets/StruggleBusLogo.png';
 
 // --- AccountSettings Component ---
 const AccountSettings = ({ user, onLogout, onDeleteAccount, onUpdateProfile }) => {
@@ -523,15 +524,72 @@ export default function App() {
 
   return (
     <div className="auth-container">
-      <h1>{isSignup ? "Create Account" : "Please Log In"}</h1>
-      {error && <p className="auth-error">{error}</p>}
-      <form onSubmit={handleSubmit} className="auth-form">
-        {isSignup && (<input placeholder="Name" value={name} onChange={e => setName(e.target.value)} required className="auth-input" />)}
-        <input placeholder="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} required className="auth-input" />
-        <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required className="auth-input" />
-        <button type="submit" className="auth-submit-btn">{isSignup ? "Sign Up" : "Log In"}</button>
-      </form>
-      <p className="auth-toggle">{isSignup ? "Already have an account?" : "Need an account?"} <button onClick={() => { setIsSignup(!isSignup); setError(''); }} className="auth-toggle-btn">{isSignup ? "Log In" : "Sign Up"}</button></p>
+      <div className="auth-card">
+        {/* Logo Section - Now using the imported variable */}
+        <div className="logo-wrapper">
+          <img 
+            src={struggleBusLogo} 
+            alt="Struggle Bus" 
+            className="auth-logo" 
+          />
+        </div>
+
+        <h1 className="auth-heading">
+          {isSignup ? "Create Account" : "Login"}
+        </h1>
+
+        {error && <div className="auth-error-box">{error}</div>}
+
+        <form onSubmit={handleSubmit} className="auth-form">
+          {isSignup && (
+            <input
+              className="auth-input"
+              placeholder="Full Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          )}
+
+          <input
+            className="auth-input"
+            placeholder="Enter Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+
+          <input
+            className="auth-input"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+
+          <button className="auth-submit-btn" type="submit">
+            {isSignup ? "Sign up" : "Sign in"}
+          </button>
+        </form>
+
+        <div className="auth-toggle">
+          <p>
+            {isSignup ? "Already have an account?" : "Need an account?"}
+            <button 
+              className="auth-toggle-btn"
+              onClick={() => {
+                setIsSignup(!isSignup);
+                setError("");
+              }}
+            >
+              {isSignup ? "Log In" : "Sign Up"}
+            </button>
+          </p>
+        </div>
+      </div>
     </div>
   );
+
 }

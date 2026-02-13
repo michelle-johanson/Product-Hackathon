@@ -1,64 +1,147 @@
 /* ============================================
-   AUTH.CSS - Authentication Component Styles
+   AUTH.CSS - Final Polish to match Figma
    ============================================ */
 
 .auth-container {
-  padding: 50px;
-  text-align: center;
-  font-family: sans-serif;
-  background-color: var(--color-bg-app);
-  height: 100vh;
-  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #ffffff;
+  /* Pure white background */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-.auth-error {
-  color: var(--color-danger);
+.auth-card {
+  width: 100%;
+  max-width: 700px;
+  /* INCREASED: Gives everything more room to breathe */
+  text-align: center;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo-wrapper {
+  margin-bottom: 30px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.auth-logo {
+  width: 100%;
+  max-width: 500px;
+  /* INCREASED: Makes the bus much bigger */
+  height: auto;
+  object-fit: contain;
+}
+
+.auth-heading {
+  font-size: 2.5rem;
+  /* INCREASED font size */
+  font-weight: 400;
+  margin-bottom: 40px;
+  color: #333;
+  letter-spacing: 0.5px;
 }
 
 .auth-form {
-  max-width: 300px;
-  margin: 0 auto;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 25px;
+  /* More space between inputs */
+  align-items: center;
 }
 
 .auth-input {
-  padding: 10px;
-  border: 1px solid var(--color-border-medium);
-  border-radius: var(--radius-sm);
+  width: 100%;
+  max-width: 550px;
+  /* INCREASED: Matches the wide inputs in Figma */
+  height: 60px;
+  /* Taller inputs */
+  padding: 0 30px;
+  /* More internal padding */
+  background-color: #d9d9d9;
+  /* The exact dark grey from Figma */
+  border: none;
+  border-radius: 30px;
+  /* Perfectly round pill shape */
+  font-size: 1.1rem;
+  color: #333;
+  outline: none;
+  transition: background-color 0.2s;
+}
+
+.auth-input:focus {
+  background-color: #e6e6e6;
+  /* Slight highlight on focus */
+}
+
+.auth-input::placeholder {
+  color: #555;
+  font-weight: 500;
 }
 
 .auth-submit-btn {
-  padding: 10px;
-  background-color: var(--color-primary);
-  color: white;
+  width: 100%;
+  max-width: 250px;
+  /* Kept somewhat smaller than inputs, per design */
+  height: 55px;
+  margin-top: 20px;
+  background-color: #fcd34d;
+  /* Updated to a brighter Figma yellow */
+  color: #333;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 1.1rem;
   cursor: pointer;
-  font-weight: bold;
-  transition: var(--transition-bg);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  /* Subtle shadow like the design */
+  transition: transform 0.1s, opacity 0.2s;
 }
 
 .auth-submit-btn:hover {
-  background-color: var(--color-primary-hover);
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.auth-submit-btn:active {
+  transform: translateY(1px);
 }
 
 .auth-toggle {
-  margin-top: 20px;
+  margin-top: 40px;
+  color: #666;
+  font-size: 0.95rem;
 }
 
 .auth-toggle-btn {
   background: none;
   border: none;
-  color: var(--color-primary);
-  text-decoration: underline;
+  color: #3498db;
+  font-weight: bold;
   cursor: pointer;
-  font-size: 1rem;
+  text-decoration: none;
+  margin-left: 5px;
+  font-size: 0.95rem;
 }
 
-.loading-container {
-  padding: 50px;
+.auth-toggle-btn:hover {
+  text-decoration: underline;
+}
+
+.auth-error-box {
+  background-color: #ffe8e8;
+  color: #c0392b;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  width: 100%;
+  max-width: 550px;
   text-align: center;
-  font-family: sans-serif;
+  border: 1px solid #e8e8e8;
 }
