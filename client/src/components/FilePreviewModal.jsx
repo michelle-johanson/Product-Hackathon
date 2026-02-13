@@ -18,20 +18,28 @@ export default function FilePreviewModal({ file, onClose }) {
       .finally(() => setLoading(false));
   }, [file, fileUrl]);
 
+  // Fix for line breaks: Markdown ignores single newlines. 
+  // We replace single newlines with "  \n" (two spaces + newline) to force a visual break.
+  const formatMarkdown = (content) => {
+    if (!content) return '';
+    return content.replace(/\n/g, '  \n');
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content modal-wide" onClick={(e) => e.stopPropagation()}>
         <div className="preview-header">
           <h3 className="modal-title">{file.name}</h3>
           <div className="preview-header-actions">
-            <a href={fileUrl} target="_blank" rel="noreferrer" className="btn-file-action btn-download" download>
+            <a href={fileUrl} target="_blank" rel="noreferrer" className="btn-download" download>
               Download
             </a>
             <button className="modal-close-btn-inline" onClick={onClose}>&times;</button>
           </div>
         </div>
 
-        <div className="preview-body">
+        {/* Dynamic Class: md-view removes the grey bars, pdf-view keeps them */}
+        <div className={`preview-body ${file.type === 'PDF' ? 'pdf-view' : 'md-view'}`}>
           {file.type === 'PDF' ? (
             <iframe
               src={fileUrl}
@@ -39,10 +47,10 @@ export default function FilePreviewModal({ file, onClose }) {
               title={file.name}
             />
           ) : loading ? (
-            <p>Loading preview...</p>
+            <div style={{ padding: '40px', textAlign: 'center' }}>Loading preview...</div>
           ) : (
             <div className="md-preview-body">
-              <ReactMarkdown>{mdContent}</ReactMarkdown>
+              <ReactMarkdown>{formatMarkdown(mdContent)}</ReactMarkdown>
             </div>
           )}
         </div>
