@@ -1457,3 +1457,750 @@ input {
   padding: 0;
   margin: 0;
 }
+
+/* ============================================
+   STYLES.CSS - Layout + Dashboard Update
+   ============================================ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #ffffff;
+  color: #333;
+}
+
+.layout-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* ===== UPDATED SIDEBAR (Matches Screenshot) ===== */
+.layout-sidebar {
+  width: 250px;
+  background-color: var(--color-sidebar-dark);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  transition: width 0.3s ease;
+}
+
+.layout-sidebar.collapsed {
+  width: 80px;
+}
+
+.layout-sidebar-header {
+  padding: 20px;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.layout-toggle-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.layout-nav {
+  flex: 1;
+  padding: 20px 0;
+  overflow-y: auto;
+}
+
+.sidebar-link {
+  padding: 15px 25px;
+  font-size: 1.5rem;
+  /* Larger text like screenshot */
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.sidebar-link:hover {
+  background: var(--color-sidebar-hover);
+}
+
+.sidebar-link.active::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  width: 4px;
+  height: 30px;
+  background-color: white;
+  border-radius: 2px;
+}
+
+/* Sidebar Action Buttons at Bottom */
+.sidebar-action-buttons {
+  padding: 20px;
+  display: flex;
+  gap: 15px;
+  background-color: transparent;
+}
+
+.sidebar-circle-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--color-auth-btn-yellow);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== MAIN CONTENT ===== */
+.layout-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+}
+
+.layout-header {
+  padding: 15px 40px;
+  display: none;
+  /* Hide top header to match screenshot view */
+}
+
+.layout-content-flush {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ===== CREATE/JOIN GROUP VIEW (Pixel Perfect) ===== */
+.group-mgmt-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  padding: 40px;
+}
+
+.mgmt-section {
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.mgmt-heading {
+  font-size: 2rem;
+  font-weight: 400;
+  margin-bottom: 30px;
+}
+
+.mgmt-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+.mgmt-input {
+  width: 100%;
+  height: 50px;
+  background-color: var(--color-auth-input-bg);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 0 25px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.mgmt-input::placeholder {
+  color: #666;
+}
+
+.mgmt-submit-btn {
+  width: 220px;
+  height: 45px;
+  background-color: var(--color-auth-btn-yellow);
+  border: none;
+  border-radius: var(--radius-pill);
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.mgmt-divider {
+  width: 100%;
+  max-width: 500px;
+  border: none;
+  border-top: 2px dashed #ccc;
+  margin: 40px 0;
+}
+
+.user-avatar {
+  width: 35px;
+  height: 35px;
+  background: var(--color-primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* ============================================
+   STYLES.CSS - Refined Sidebar & Layout
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: #ffffff;
+  color: #333;
+}
+
+.layout-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* ===== UPDATED SIDEBAR ===== */
+.layout-sidebar {
+  width: 250px;
+  background-color: var(--color-sidebar-dark);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  transition: var(--transition-sidebar);
+  position: relative;
+  border: none;
+  /* Removed black line */
+}
+
+.layout-sidebar.collapsed {
+  width: 80px;
+}
+
+.layout-sidebar-header {
+  padding: 20px;
+  display: flex;
+  justify-content: flex-end;
+  /* Arrow to the right */
+  align-items: center;
+  min-height: 60px;
+}
+
+.layout-toggle-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 1.5rem;
+  /* More prominent arrow */
+  font-weight: bold;
+  padding: 5px;
+  line-height: 1;
+  transition: transform 0.3s ease;
+}
+
+.layout-sidebar.collapsed .layout-toggle-btn {
+  transform: rotate(180deg);
+}
+
+.layout-nav {
+  flex: 1;
+  padding: 10px 0;
+  overflow-y: auto;
+  font-family: var(--font-sidebar);
+  /* Sidebar Font */
+}
+
+.sidebar-link {
+  padding: 12px 25px;
+  font-size: 1.2rem;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+/* Permanent White Indicator */
+.sidebar-link::before {
+  content: "";
+  display: block;
+  width: 4px;
+  height: 24px;
+  background-color: white;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.sidebar-link:hover {
+  background: var(--color-sidebar-hover);
+}
+
+.sidebar-link.active {
+  background: var(--color-sidebar-hover);
+  font-weight: 700;
+}
+
+/* Hide text when collapsed */
+.layout-sidebar.collapsed .link-text {
+  display: none;
+}
+
+/* Sidebar Action Buttons at Bottom */
+.sidebar-action-buttons {
+  padding: 20px;
+  display: flex;
+  gap: 12px;
+  background-color: transparent;
+  border-top: none;
+  /* Removed black line/divider */
+  transition: flex-direction 0.3s ease;
+}
+
+/* Horizontal when expanded, Vertical when collapsed */
+.layout-sidebar:not(.collapsed) .sidebar-action-buttons {
+  flex-direction: row;
+}
+
+.layout-sidebar.collapsed .sidebar-action-buttons {
+  flex-direction: column;
+  align-items: center;
+}
+
+.sidebar-circle-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: var(--color-auth-btn-yellow);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s;
+}
+
+.sidebar-circle-btn:hover {
+  transform: scale(1.1);
+}
+
+/* ===== MAIN CONTENT ===== */
+.layout-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+}
+
+.layout-content-flush {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* MGMT View Styles */
+.group-mgmt-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  padding: 40px;
+}
+
+.mgmt-section {
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+}
+
+.mgmt-heading {
+  font-size: 2.2rem;
+  font-weight: 400;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+.mgmt-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+.mgmt-input {
+  width: 100%;
+  height: 55px;
+  background-color: var(--color-auth-input-bg);
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 0 30px;
+  font-size: 1.1rem;
+  outline: none;
+}
+
+.mgmt-submit-btn {
+  width: 240px;
+  height: 50px;
+  background-color: var(--color-auth-btn-yellow);
+  border: none;
+  border-radius: var(--radius-pill);
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.mgmt-divider {
+  width: 100%;
+  max-width: 600px;
+  border: none;
+  border-top: 2px dashed #ddd;
+  margin: 50px 0;
+}
+
+/* Update this section in your client/src/styles/styles.css */
+
+/* Sidebar Action Buttons at Bottom */
+.sidebar-action-buttons {
+  padding: 20px;
+  display: flex;
+  gap: 12px;
+  background-color: transparent;
+  border-top: none;
+  transition: flex-direction 0.3s ease;
+  /* Add this line to center the bubbles horizontally when expanded */
+  justify-content: center;
+}
+
+/* Horizontal when expanded, Vertical when collapsed */
+.layout-sidebar:not(.collapsed) .sidebar-action-buttons {
+  flex-direction: row;
+  /* Ensures they stay centered if the container width changes */
+  justify-content: center;
+}
+
+.layout-sidebar.collapsed .sidebar-action-buttons {
+  flex-direction: column;
+  align-items: center;
+  /* Centers them vertically in the column when collapsed */
+  justify-content: center;
+}
+
+/* Rest of your sidebar-circle-btn styles remain the same... */
+.sidebar-circle-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: var(--color-auth-btn-yellow);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s;
+}
+
+/* ============================================
+   STYLES.CSS - Group Page & Chat Refinement
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: #ffffff;
+}
+
+/* ===== GROUP PAGE LAYOUT ===== */
+.group-page-container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+.center-content-padded {
+  flex: 1;
+  padding: 40px 60px;
+  overflow-y: auto;
+  background-color: #ffffff;
+}
+
+/* Heading & Subtext */
+.group-title {
+  font-family: var(--font-heading-serif);
+  font-size: 3rem;
+  margin-bottom: 15px;
+  color: #000;
+}
+
+.group-subtitle {
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+/* ===== PILL TAB NAVIGATION ===== */
+.tab-navigation-wrapper {
+  background-color: var(--color-tab-pill-bg);
+  padding: 5px;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  gap: 5px;
+  margin-bottom: 30px;
+  width: 100%;
+  max-width: 500px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px 20px;
+  border: none;
+  background: transparent;
+  color: white;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  font-weight: 400;
+  font-size: 0.95rem;
+  transition: var(--transition-all);
+}
+
+.tab-btn.active {
+  background-color: var(--color-active-beige);
+  color: #000;
+}
+
+/* ===== FILE SECTION STYLING ===== */
+.file-controls-top {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.btn-yellow-action {
+  background-color: var(--color-action-yellow);
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(--radius-pill);
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.file-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.file-pill-item {
+  background-color: var(--color-active-beige);
+  padding: 20px 30px;
+  border-radius: var(--radius-file-pill);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.file-pill-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-weight: 500;
+}
+
+.bottom-action-container {
+  margin-top: 40px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ===== RIGHT CHAT PANEL ===== */
+.right-panel {
+  background-color: #f1f2f4;
+  /* Light grey/blue background */
+  border-left: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header-toggle {
+  background-color: var(--color-sidebar-dark);
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.panel-close-arrow {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.chat-toggle-pill {
+  background-color: var(--color-active-beige);
+  border-radius: var(--radius-pill);
+  display: flex;
+  padding: 4px;
+  width: 180px;
+}
+
+.toggle-segment {
+  flex: 1;
+  padding: 6px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.toggle-segment.active {
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.chat-timestamp-header {
+  text-align: center;
+  padding: 25px 0;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.chat-history-container {
+  flex: 1;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  overflow-y: auto;
+}
+
+/* Chat Bubbles */
+.msg-bubble {
+  max-width: 80%;
+  padding: 15px 25px;
+  border-radius: 25px;
+  font-size: 0.95rem;
+}
+
+.msg-bubble.dark {
+  background-color: var(--color-msg-dark);
+  color: white;
+  align-self: flex-end;
+}
+
+.msg-bubble.light {
+  background-color: var(--color-msg-light);
+  color: #000;
+  align-self: flex-start;
+}
+
+.msg-bubble.large-rect {
+  border-radius: 20px;
+  min-height: 200px;
+}
+
+/* Resizer */
+.resizer-handle {
+  width: 6px;
+  cursor: col-resize;
+  background: transparent;
+  transition: background 0.2s;
+}
+
+.resizer-handle:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Add this to your client/src/styles/styles.css */
+
+.sidebar-icon-img {
+  width: 24px;
+  /* Adjusted for visual balance inside a 42px button */
+  height: 24px;
+  object-fit: contain;
+  /* If your SVGs are black and you want them to look dark grey like the text */
+  filter: brightness(0) saturate(100%) invert(39%) sepia(10%) saturate(600%) hue-rotate(185deg) brightness(95%) contrast(90%);
+}
+
+.sidebar-circle-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: var(--color-auth-btn-yellow);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s;
+  padding: 0;
+  /* Clear padding for precise centering */
+}
