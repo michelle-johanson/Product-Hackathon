@@ -133,6 +133,21 @@ router.get('/:groupId', auth, async (req, res) => {
   try {
     const { groupId } = req.params;
     const { search } = req.query;
+    const userId = req.user?.id;
+
+    // Verify user is a member of the group
+    const membership = await prisma.groupMember.findUnique({
+      where: {
+        groupId_userId: {
+          groupId: parseInt(groupId),
+          userId: userId
+        }
+      }
+    });
+
+    if (!membership) {
+      return res.status(403).json({ error: 'You do not have access to this group' });
+    }
 
     const where = { groupId: parseInt(groupId) };
 
@@ -174,6 +189,20 @@ router.post('/:groupId', auth, upload.single('file'), async (req, res) => {
     const { groupId } = req.params;
     const userId = req.user?.id;
 
+    // Verify user is a member of the group
+    const membership = await prisma.groupMember.findUnique({
+      where: {
+        groupId_userId: {
+          groupId: parseInt(groupId),
+          userId: userId
+        }
+      }
+    });
+
+    if (!membership) {
+      return res.status(403).json({ error: 'You do not have access to this group' });
+    }
+
     const isPdf = req.file.mimetype === 'application/pdf';
     const type = isPdf ? 'PDF' : 'MD';
 
@@ -183,11 +212,8 @@ router.post('/:groupId', auth, upload.single('file'), async (req, res) => {
     try {
       if (isPdf) {
         const dataBuffer = fs.readFileSync(filePath);
-        const parser = new PDFParse({ data: new Uint8Array(dataBuffer), verbosity: 0 });
-        const doc = await parser.load();
-        const textResult = await parser.getText(doc);
-        content = textResult.text || '';
-        await parser.destroy();
+        const pdfData = await PDFParse(dataBuffer);
+        content = pdfData.text || '';
       } else {
         content = fs.readFileSync(filePath, 'utf-8');
       }
@@ -217,10 +243,16 @@ router.post('/:groupId', auth, upload.single('file'), async (req, res) => {
 router.delete('/:fileId', auth, async (req, res) => {
   try {
     const { fileId } = req.params;
+    const userId = req.user?.id;
     const file = await prisma.file.findUnique({ where: { id: parseInt(fileId) } });
 
     if (!file) {
       return res.status(404).json({ error: 'File not found' });
+    }
+
+    // Verify user is deleting their own file
+    if (file.uploadedBy !== userId) {
+      return res.status(403).json({ error: 'You can only delete your own files' });
     }
 
     // Remove from disk
