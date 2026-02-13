@@ -223,7 +223,6 @@ export default function GroupPage({ group, socket, user, refreshGroups }) {
         </div>
 
         <div className="chat-panel-body">
-          <div className="chat-timestamp">Friday, February 13, 9:10 AM</div>
           <div className="chat-messages-wrapper">
              {chatMode === 'group' ? (
                <ChatComponent groupId={group.id} socket={socket} user={user} />

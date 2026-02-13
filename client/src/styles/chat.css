@@ -112,6 +112,7 @@
   background: transparent;
   outline: none;
   height: 40px;
+  font-size: 1rem;
 }
 
 .chat-send-btn-circle {
