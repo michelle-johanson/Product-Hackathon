@@ -5,3 +5,4 @@ npm-debug.log*
 coverage/
 client/dist/
 prisma/migrations/dev.db
+test-gemini-key.js
