@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 export default function AiChatComponent({ groupId, user }) {
   const [messages, setMessages] = useState([]);
@@ -21,7 +22,7 @@ export default function AiChatComponent({ groupId, user }) {
     setMessages([
       {
         id: 'greeting',
-        text: 'Hey there! I\'m Jerry the Driver, ready to help you cruise through your studies! What can I help you with today?',
+        text: 'Hey there! I\'m Jerry the Driver, ready to help you cruise through your studies! Ask me anything about your uploaded files and notes.',
         sender: 'ai',
         timestamp: new Date()
       }
@@ -30,7 +31,7 @@ export default function AiChatComponent({ groupId, user }) {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    
+
     if (!inputValue.trim() || isLoading) return;
 
     const userMessage = {
@@ -51,8 +52,7 @@ export default function AiChatComponent({ groupId, user }) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Add your auth token if needed
-          'Authorization': `Bearer ${localStorage.getItem('token')}` 
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({
           question: inputValue,
@@ -81,7 +81,7 @@ export default function AiChatComponent({ groupId, user }) {
 
     } catch (error) {
       console.error('Error sending message:', error);
-      
+
       // Add error message
       const errorMessage = {
         id: (Date.now() + 1).toString(),
@@ -90,7 +90,7 @@ export default function AiChatComponent({ groupId, user }) {
         timestamp: new Date(),
         isError: true
       };
-      
+
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
@@ -109,14 +109,14 @@ export default function AiChatComponent({ groupId, user }) {
           borderBottom: '1px solid #ffeaa7',
           textAlign: 'center'
         }}>
-          ⚠️ Demo Mode: AI responses are simulated. Add your API key to enable real AI.
+          Demo Mode: AI responses are simulated. Add your API key to enable real AI.
         </div>
       )}
 
       {/* Chat Messages Area */}
-      <div className="ai-chat-history" style={{ 
-        flex: 1, 
-        overflowY: 'auto', 
+      <div className="ai-chat-history" style={{
+        flex: 1,
+        overflowY: 'auto',
         padding: '20px',
         display: 'flex',
         flexDirection: 'column',
@@ -126,7 +126,7 @@ export default function AiChatComponent({ groupId, user }) {
           <div key={msg.id} className={`msg-group ${msg.sender === 'user' ? 'own' : 'other'}`}>
             {msg.sender === 'ai' && (
               <div className="msg-sender-name" style={{ color: '#ffffff' }}>
-                🚗 Jerry the Driver
+                Jerry the Driver
               </div>
             )}
             {msg.sender === 'user' && (
@@ -134,15 +134,21 @@ export default function AiChatComponent({ groupId, user }) {
                 {user?.name || 'You'}
               </div>
             )}
-            
+
             <div className={`msg-bubble ${msg.sender === 'user' ? 'dark' : 'light'}`}>
-              {msg.text}
-              
+              {msg.sender === 'ai' ? (
+                <div className="ai-markdown-content">
+                  <ReactMarkdown>{msg.text}</ReactMarkdown>
+                </div>
+              ) : (
+                msg.text
+              )}
+
               {/* Show sources if available */}
-              {msg.sources && msg.sources.length > 0 && (
-                <div style={{ 
-                  marginTop: '10px', 
-                  paddingTop: '10px', 
+              {msg.sources && msg.sources.length > 0 && msg.sources[0] !== 'General Knowledge' && (
+                <div style={{
+                  marginTop: '10px',
+                  paddingTop: '10px',
                   borderTop: '1px solid rgba(0,0,0,0.1)',
                   fontSize: '0.8rem',
                   opacity: 0.8
@@ -153,7 +159,7 @@ export default function AiChatComponent({ groupId, user }) {
             </div>
           </div>
         ))}
-        
+
         {/* Loading indicator */}
         {isLoading && (
           <div className="msg-group other">
@@ -165,7 +171,7 @@ export default function AiChatComponent({ groupId, user }) {
             </div>
           </div>
         )}
-        
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -181,13 +187,13 @@ export default function AiChatComponent({ groupId, user }) {
               onChange={(e) => setInputValue(e.target.value)}
               disabled={isLoading}
             />
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="chat-send-btn-circle"
               disabled={isLoading || !inputValue.trim()}
               style={{ opacity: isLoading || !inputValue.trim() ? 0.5 : 1 }}
             >
-              <span style={{ fontSize: '1.2rem' }}>➤</span>
+              <span style={{ fontSize: '1.2rem' }}>&#10148;</span>
             </button>
           </div>
         </form>
