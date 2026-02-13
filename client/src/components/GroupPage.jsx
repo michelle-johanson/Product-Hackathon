@@ -17,7 +17,6 @@ export default function GroupPage({ group, socket, user, refreshGroups }) {
     setIsResizing(true);
   };
 
-  // Fixed Resizing Logic
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!isResizing) return;
@@ -72,7 +71,6 @@ export default function GroupPage({ group, socket, user, refreshGroups }) {
 
   return (
     <div className={`group-page-layout ${isResizing ? 'resizing' : ''}`}>
-      {/* MAIN CONTENT AREA */}
       <div className="main-content-area">
         <div className="main-content-inner">
           <h1 className="group-title">{groupDetails.name}</h1>
@@ -106,8 +104,8 @@ export default function GroupPage({ group, socket, user, refreshGroups }) {
                   <div className="invite-pill-container">
                     <span className="invite-label">Invite Code:</span>
                     <span>{groupDetails.inviteCode}</span>
-                    <button className="copy-icon-btn" onClick={copyToClipboard} title="Copy Code">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <button className="copy-icon-btn" onClick={copyToClipboard}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                         <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                       </svg>
@@ -117,7 +115,7 @@ export default function GroupPage({ group, socket, user, refreshGroups }) {
 
                 <div className="bus-card">
                   <div className="bus-members-section">
-                    <p className="bus-label">On This Bus:</p>
+                    <p className="bus-label">On This Bus</p> {/* Refined label */}
                     {groupDetails.members?.map(m => (
                       <div key={m.user?.id} className="member-pill">
                         {m.user?.name}
@@ -139,10 +137,8 @@ export default function GroupPage({ group, socket, user, refreshGroups }) {
         </div>
       </div>
 
-      {/* RESIZER HANDLE */}
       <div className="resizer-handle" onMouseDown={startResizing} />
 
-      {/* RIGHT PANEL */}
       <div className="right-chat-panel" style={{ width: sidebarWidth }}>
         <div className="chat-panel-header">
           <div className="chat-toggle-pill">
@@ -162,7 +158,7 @@ export default function GroupPage({ group, socket, user, refreshGroups }) {
         </div>
 
         <div className="chat-panel-body">
-          <div className="chat-timestamp">Friday, February 13, 9:10 AM</div>
+          <div className="chat-timestamp">Friday, February 13, 9:10 AM</div> {/* Improved visibility CSS will apply here */}
           <div className="chat-messages-wrapper">
              {chatMode === 'group' ? (
                <ChatComponent groupId={group.id} socket={socket} user={user} />
