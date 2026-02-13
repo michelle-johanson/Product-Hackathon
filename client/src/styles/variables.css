@@ -1,84 +1,49 @@
 /* ============================================
-   VARIABLES.CSS - Design Tokens (Updated)
+   VARIABLES.CSS - Design Tokens
    ============================================ */
 
 :root {
-/* ===== FIGMA TOKENS ===== */
+  /* ===== FIGMA TOKENS ===== */
   --color-auth-input-bg: #d9d9d9;
   --color-auth-btn-yellow: #fcd34d;
   --color-sidebar-dark: #5e6472;
-  
-  /* New Group Page Colors */
-  --color-tab-pill-bg: #5e6472;     /* Dark slate for tab bar */
-  --color-active-beige: #e4e2d4;    /* Beige for active tab and file pills */
-  --color-msg-dark: #5e6472;       /* Dark slate for chat bubbles */
-  --color-msg-light: #e4e2d4;      /* Light beige for chat bubbles */
-  --color-action-yellow: #fcd34d;  /* Yellow for buttons */
 
-  /* Fonts */
+  /* ===== GROUP PAGE COLORS ===== */
+  --color-tab-pill-bg: #5e6472;
+  --color-active-beige: #e4e2d4;
+  --color-msg-dark: #5e6472;
+  --color-msg-light: #e4e2d4;
+  --color-action-yellow: #fcd34d;
+
+  /* ===== FONTS ===== */
   --font-sidebar: 'Albert Sans', sans-serif;
-  --font-heading-serif: 'Georgia', serif; /* For the group title "Math 213" */
-  --font-main: 'Albert Sans', -apple-system, sans-serif;
+  --font-heading-serif: 'Georgia', serif;
+  --font-main: 'Albert Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
+  /* ===== BORDER RADIUS ===== */
   --radius-pill: 30px;
   --radius-btn-auth: 25px;
   --radius-file-pill: 15px;
-
-  /* Global Colors */
-  --color-bg-app: #f4f4f9;
-  --color-bg-surface: #ffffff;
-  --color-primary: #3498db;
-  --color-text-primary: #333333;
-  --color-text-secondary: #666666;
-
-  --transition-all: all 0.2s ease;
-  --transition-sidebar: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-  /* Fonts */
-  --font-sidebar: 'Albert Sans', sans-serif;
-  --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-
-  --radius-pill: 30px;
-  --radius-btn-auth: 25px;
-
-  /* ===== EXISTING TOKENS ===== */
-  --color-bg-app: #f4f4f9;
-  --color-bg-surface: #ffffff;
-  --color-primary: #3498db;
-  --color-primary-hover: #2980b9;
-  --color-text-primary: #333333;
-  --color-text-secondary: #666666;
-  --color-danger: #e74c3c;
-  --color-danger-bg: #ffe8e8;
-  --color-danger-border: #e8e8e8;
-
-  --color-sidebar-bg: var(--color-sidebar-dark);
-  --color-sidebar-hover: rgba(255, 255, 255, 0.1);
-  --color-sidebar-text: #ffffff;
-
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
   --radius-xl: 12px;
   --radius-full: 50%;
 
-  --transition-all: all 0.2s ease;
-  --transition-sidebar: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-  /* ===== EXISTING Background Colors (Kept) ===== */
+  /* ===== BACKGROUND COLORS ===== */
   --color-bg-app: #f4f4f9;
   --color-bg-surface: #ffffff;
   --color-bg-surface-hover: #f9f9fc;
   --color-bg-muted: #fafafa;
   --color-bg-elevated: #f0f0f0;
 
-  /* ===== EXISTING Sidebar (Kept) ===== */
-  --color-sidebar-bg: #2c3e50;
-  --color-sidebar-hover: #34495e;
+  /* ===== SIDEBAR COLORS ===== */
+  --color-sidebar-bg: #5e6472;
+  --color-sidebar-hover: rgba(255, 255, 255, 0.1);
+  --color-sidebar-text: #ffffff;
   --color-sidebar-border: #34495e;
-  --color-sidebar-text: #bdc3c7;
 
-  /* ===== EXISTING Text Colors (Kept) ===== */
+  /* ===== TEXT COLORS ===== */
   --color-text-primary: #333333;
   --color-text-secondary: #666666;
   --color-text-muted: #888888;
@@ -86,14 +51,14 @@
   --color-text-lighter: #bbbbbb;
   --color-text-heading: #2c3e50;
 
-  /* ===== EXISTING Border Colors (Kept) ===== */
+  /* ===== BORDER COLORS ===== */
   --color-border-light: #eeeeee;
   --color-border-default: #dddddd;
   --color-border-medium: #cccccc;
   --color-border-dark: #555555;
   --color-border-message: #bdc3c7;
 
-  /* ===== EXISTING Primary/Brand (Blue) (Kept) ===== */
+  /* ===== PRIMARY/BRAND (BLUE) ===== */
   --color-primary: #3498db;
   --color-primary-hover: #2980b9;
   --color-primary-light: #ebf5fb;
@@ -101,18 +66,18 @@
   --color-primary-alt: #3b82f6;
   --color-primary-legacy: #008CBA;
 
-  /* ===== EXISTING Success (Green) (Kept) ===== */
+  /* ===== SUCCESS (GREEN) ===== */
   --color-success: #2ecc71;
   --color-success-hover: #27ae60;
   --color-success-dark: #229954;
   --color-success-text: #27ae60;
   --color-success-legacy: #4CAF50;
 
-  /* ===== EXISTING Warning (Orange) (Kept) ===== */
+  /* ===== WARNING (ORANGE) ===== */
   --color-warning: #f39c12;
   --color-warning-text: #e67e22;
 
-  /* ===== EXISTING Danger (Red) (Kept) ===== */
+  /* ===== DANGER (RED) ===== */
   --color-danger: #e74c3c;
   --color-danger-hover: #c0392b;
   --color-danger-bg: #ffe8e8;
@@ -121,27 +86,22 @@
   --color-danger-light: #ff6b6b;
   --color-danger-lightest: #fff5f5;
 
-  /* ===== EXISTING Neutral/Gray (Kept) ===== */
+  /* ===== NEUTRAL/GRAY ===== */
   --color-gray-medium: #7f8c8d;
   --color-gray-light: #9ca3af;
   --color-disabled: #bdc3c7;
 
-  /* ===== EXISTING Border Radius (Kept) ===== */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
-  --radius-full: 50%;
-
-  /* ===== EXISTING Shadows (Kept) ===== */
+  /* ===== SHADOWS ===== */
   --shadow-subtle: 0 2px 4px rgba(0, 0, 0, 0.05);
   --shadow-medium: 0 2px 5px rgba(0, 0, 0, 0.1);
   --shadow-strong: 0 10px 40px rgba(0, 0, 0, 0.2);
   --shadow-chat: 0 2px 8px rgba(0, 0, 0, 0.1);
 
-  /* ===== EXISTING Transitions (Kept) ===== */
+  /* ===== TRANSITIONS ===== */
   --transition-fast: 0.2s ease;
   --transition-medium: 0.3s ease;
   --transition-bg: background 0.2s;
   --transition-all: all 0.2s ease;
+  --transition-sidebar: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-border: border-color 0.2s;
 }

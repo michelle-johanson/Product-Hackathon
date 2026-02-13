@@ -130,17 +130,17 @@ export default function SharedNotes({ groupId, socket, refreshFiles }) {
     }
   };
 
-  if (loading) return <div>Loading notes...</div>;
+  if (loading) return <div style={{ padding: '20px', textAlign: 'center' }}>Loading notes...</div>;
 
   return (
-    <div className="card notes-container">
+    <div className="notes-container">
       <div className="notes-header">
-        <h3 className="notes-title">📝 Shared Study Notes</h3>
+        <h3 className="notes-title">Shared Notes</h3>
         <div className="notes-controls">
           <span className={`save-status ${saveStatus.includes('Autosaved') ? 'autosaved' : saveStatus === 'All changes saved' ? 'saved' : 'unsaved'}`}>
             {saveStatus}
           </span>
-          <button onClick={openSaveModal} className="btn-save-context">
+          <button onClick={openSaveModal} className="btn-action-yellow">
             Save as Context
           </button>
         </div>
@@ -151,11 +151,12 @@ export default function SharedNotes({ groupId, socket, refreshFiles }) {
         onChange={handleChange}
         placeholder="Start typing your group notes here..."
         className="notes-textarea"
+        spellCheck="false"
       />
 
       {showModal && (
         <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '400px', height: 'auto' }}>
+          <div className="modal-content">
             <h3 className="modal-title">Name your file</h3>
             <input
               type="text"
@@ -165,7 +166,7 @@ export default function SharedNotes({ groupId, socket, refreshFiles }) {
               placeholder="Enter file name..."
               autoFocus
             />
-            <div style={{ display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'flex-end' }}>
+            <div className="modal-actions">
               <button className="btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
               <button className="btn-primary" onClick={handleSaveAsContext}>Save</button>
             </div>

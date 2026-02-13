@@ -1,0 +1,115 @@
+/* ============================================
+   SIDEBAR.CSS - Left Navigation & Action Icons
+   ============================================ */
+
+.layout-sidebar {
+  width: 250px;
+  background-color: var(--color-sidebar-bg);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  transition: width var(--transition-medium);
+  flex-shrink: 0;
+}
+
+.layout-sidebar.collapsed {
+  width: 70px;
+}
+
+.layout-sidebar-header {
+  padding: 20px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 70px;
+}
+
+.layout-toggle-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+}
+
+.layout-nav {
+  flex: 1;
+  padding: 10px 0;
+  overflow-y: auto;
+}
+
+.sidebar-link {
+  padding: 15px 25px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  color: var(--color-sidebar-text);
+  display: flex;
+  align-items: center;
+  transition: var(--transition-all);
+  text-decoration: none;
+  font-size: 1.2rem;
+  position: relative;
+  border-left: 5px solid white; 
+}
+
+.sidebar-link.active {
+  border-left-color: var(--color-auth-btn-yellow);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.layout-sidebar.collapsed .sidebar-link {
+  border-left: none;
+  justify-content: center;
+}
+
+.layout-sidebar.collapsed .sidebar-link::before {
+  content: "";
+  display: block;
+  width: 5px;
+  height: 30px;
+  background-color: white;
+  border-radius: 2px;
+}
+
+.layout-sidebar.collapsed .sidebar-link.active::before,
+.layout-sidebar.collapsed .sidebar-link:hover::before {
+  background-color: var(--color-auth-btn-yellow);
+}
+
+/* Yellow Action Bubbles */
+.sidebar-action-buttons {
+  padding: 20px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: auto;
+  flex-direction: row;
+}
+
+.layout-sidebar.collapsed .sidebar-action-buttons {
+  flex-direction: column;
+  align-items: center;
+}
+
+.sidebar-circle-btn {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background-color: var(--color-auth-btn-yellow);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+.sidebar-icon-img {
+  width: 22px;
+  height: 22px;
+  filter: brightness(0) saturate(100%) invert(20%);
+}

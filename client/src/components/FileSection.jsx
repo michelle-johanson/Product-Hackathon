@@ -94,11 +94,11 @@ export default function FileSection({ groupId }) {
   };
 
   return (
-    <div className="card file-section-card">
-      <div className="notes-header">
-        <h3 className="notes-title">Group Files</h3>
-        <div className="notes-controls">
-          <label className={`btn-save file-upload-label ${uploading ? 'disabled' : ''}`}>
+    <div className="files-container">
+      <div className="files-header">
+        <h3 className="files-title">Group Files</h3>
+        <div className="files-controls">
+          <label className={`btn-upload-label ${uploading ? 'disabled' : ''}`}>
             {uploading ? 'Uploading...' : 'Upload File'}
             <input
               type="file"
@@ -113,7 +113,7 @@ export default function FileSection({ groupId }) {
 
       <input
         type="text"
-        className="form-input file-search-input"
+        className="file-search-input"
         placeholder="Deep search files by name or content..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
@@ -121,16 +121,16 @@ export default function FileSection({ groupId }) {
 
       <div className="file-list">
         {loading ? (
-          <p>Loading files...</p>
+          <p className="file-empty-state">Loading files...</p>
         ) : files.length === 0 ? (
-          <p className="chat-empty">
+          <p className="file-empty-state">
             {searchQuery ? 'No files match your search.' : 'No files uploaded yet.'}
           </p>
         ) : (
           files.map(file => (
             <div key={file.id} className={`file-item ${file.contentMatch ? 'file-item-content-match' : ''}`}>
               <div className="file-info">
-                <span className="file-icon">{file.type === 'PDF' ? '📄' : '📝'}</span>
+                <div className="file-icon">{file.type === 'PDF' ? '📄' : '📝'}</div>
                 <div className="file-meta">
                   <span className="file-name">
                     {file.name}

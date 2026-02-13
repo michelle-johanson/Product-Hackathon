@@ -58,21 +58,21 @@ const GroupManagement = ({
   );
 };
 
-// --- Updated Layout Component with SVG Icons ---
+// --- Updated Layout Component ---
 const Layout = ({ children, user, groups, currentGroup, onSelectGroup, onNavigateMgmt, onNavigateSettings }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
-    <div className="layout-container">
+    <div className="app-container">
       <aside className={`layout-sidebar ${!sidebarOpen ? 'collapsed' : ''}`}>
-        <div className="layout-sidebar-header" style={{ justifyContent: sidebarOpen ? 'space-between' : 'center' }}>
+        <div className="layout-sidebar-header">
           {sidebarOpen && (
             <span style={{ fontFamily: 'var(--font-sidebar)', fontWeight: 'bold', fontSize: '1.1rem' }}>
               {user.name}
             </span>
           )}
           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="layout-toggle-btn">
-            ‹
+            {sidebarOpen ? '‹' : '›'}
           </button>
         </div>
 
@@ -83,7 +83,7 @@ const Layout = ({ children, user, groups, currentGroup, onSelectGroup, onNavigat
               onClick={() => onSelectGroup(g)} 
               className={`sidebar-link ${currentGroup?.id === g.id ? 'active' : ''}`}
             >
-              <span className="link-text">{g.name}</span>
+              {sidebarOpen && <span className="link-text">{g.name}</span>}
             </div>
           ))}
         </nav>
@@ -257,7 +257,7 @@ export default function App() {
         ) : (
           <div style={{ padding: '60px', textAlign: 'center' }}>
             <h1 className="mgmt-heading">Welcome, {user.name}</h1>
-            <p style={{ color: '#666' }}>Select a group or click + to start.</p>
+            <p style={{ color: '#666', fontSize: '1.1rem' }}>Select a group from the sidebar or click the <span style={{color: 'var(--color-primary)'}}>+</span> icon to get started.</p>
           </div>
         )}
       </Layout>
