@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import GroupPage from './components/GroupPage';
 import struggleBusLogo from './assets/StruggleBusLogo.png';
 
+// Import your new SVG icons
+import busIcon from './assets/bus_icon.svg';
+import accountIcon from './assets/account_icon.svg';
+import addIcon from './assets/add_icon.svg';
+
 // --- Management View ---
 const GroupManagement = ({ 
   groupName, setGroupName, className, setClassName, handleCreateGroup,
@@ -9,7 +14,6 @@ const GroupManagement = ({
 }) => {
   return (
     <div className="group-mgmt-container">
-      {/* Create Section */}
       <div className="mgmt-section">
         <h2 className="mgmt-heading">Create Group</h2>
         <form onSubmit={handleCreateGroup} className="mgmt-form">
@@ -35,7 +39,6 @@ const GroupManagement = ({
 
       <hr className="mgmt-divider" />
 
-      {/* Join Section */}
       <div className="mgmt-section">
         <h2 className="mgmt-heading">Join Group</h2>
         <form onSubmit={handleJoinGroup} className="mgmt-form">
@@ -55,16 +58,21 @@ const GroupManagement = ({
   );
 };
 
-// --- Updated Layout Component ---
+// --- Updated Layout Component with SVG Icons ---
 const Layout = ({ children, user, groups, currentGroup, onSelectGroup, onNavigateMgmt, onNavigateSettings }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
     <div className="layout-container">
       <aside className={`layout-sidebar ${!sidebarOpen ? 'collapsed' : ''}`}>
-        <div className="layout-sidebar-header">
+        <div className="layout-sidebar-header" style={{ justifyContent: sidebarOpen ? 'space-between' : 'center' }}>
+          {sidebarOpen && (
+            <span style={{ fontFamily: 'var(--font-sidebar)', fontWeight: 'bold', fontSize: '1.1rem' }}>
+              {user.name}
+            </span>
+          )}
           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="layout-toggle-btn">
-            {sidebarOpen ? '‹' : '›'}
+            ‹
           </button>
         </div>
 
@@ -80,16 +88,15 @@ const Layout = ({ children, user, groups, currentGroup, onSelectGroup, onNavigat
           ))}
         </nav>
 
-        {/* This container will now center the bubbles based on the CSS update above */}
         <div className="sidebar-action-buttons">
           <button onClick={() => onSelectGroup(null)} className="sidebar-circle-btn" title="Home/Dashboard">
-            🚌
+            <img src={busIcon} alt="Bus" className="sidebar-icon-img" />
           </button>
           <button onClick={onNavigateSettings} className="sidebar-circle-btn" title="Settings">
-            👤
+            <img src={accountIcon} alt="Account" className="sidebar-icon-img" />
           </button>
           <button onClick={onNavigateMgmt} className="sidebar-circle-btn" title="Create or Join Group">
-            +
+            <img src={addIcon} alt="Add" className="sidebar-icon-img" />
           </button>
         </div>
       </aside>
@@ -103,7 +110,6 @@ const Layout = ({ children, user, groups, currentGroup, onSelectGroup, onNavigat
   );
 };
 
-// --- Management components for Auth (No changes needed to logic) ---
 const AccountSettings = ({ user, onLogout, onDeleteAccount }) => {
   return (
     <div style={{ padding: '60px', textAlign: 'center' }}>

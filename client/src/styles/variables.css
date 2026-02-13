@@ -3,11 +3,36 @@
    ============================================ */
 
 :root {
-  /* ===== NEW FIGMA TOKENS ===== */
+/* ===== FIGMA TOKENS ===== */
   --color-auth-input-bg: #d9d9d9;
   --color-auth-btn-yellow: #fcd34d;
   --color-sidebar-dark: #5e6472;
-  --color-sidebar-active-indicator: #ffffff;
+  
+  /* New Group Page Colors */
+  --color-tab-pill-bg: #5e6472;     /* Dark slate for tab bar */
+  --color-active-beige: #e4e2d4;    /* Beige for active tab and file pills */
+  --color-msg-dark: #5e6472;       /* Dark slate for chat bubbles */
+  --color-msg-light: #e4e2d4;      /* Light beige for chat bubbles */
+  --color-action-yellow: #fcd34d;  /* Yellow for buttons */
+
+  /* Fonts */
+  --font-sidebar: 'Albert Sans', sans-serif;
+  --font-heading-serif: 'Georgia', serif; /* For the group title "Math 213" */
+  --font-main: 'Albert Sans', -apple-system, sans-serif;
+
+  --radius-pill: 30px;
+  --radius-btn-auth: 25px;
+  --radius-file-pill: 15px;
+
+  /* Global Colors */
+  --color-bg-app: #f4f4f9;
+  --color-bg-surface: #ffffff;
+  --color-primary: #3498db;
+  --color-text-primary: #333333;
+  --color-text-secondary: #666666;
+
+  --transition-all: all 0.2s ease;
+  --transition-sidebar: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Fonts */
   --font-sidebar: 'Albert Sans', sans-serif;
