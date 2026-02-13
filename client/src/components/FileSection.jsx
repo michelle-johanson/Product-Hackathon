@@ -143,9 +143,6 @@ export default function FileSection({ groupId }) {
                 <button className="btn-file-action btn-preview" onClick={() => setPreviewFile(file)}>
                   Preview
                 </button>
-                <a href={`http://localhost:3000/uploads/${file.url}`} target="_blank" rel="noreferrer" className="btn-file-action btn-download" download>
-                  Download
-                </a>
                 <button className="btn-file-action btn-delete-file" onClick={() => handleDelete(file.id, file.name)}>
                   Delete
                 </button>
