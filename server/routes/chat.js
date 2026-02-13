@@ -16,7 +16,7 @@ try {
   } else {
     console.log('✅ Google Gemini API Key loaded');
     const genAI = new GoogleGenerativeAI(apiKey);
-    model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
+    model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     apiKeyValid = true;
   }
 } catch (err) {
