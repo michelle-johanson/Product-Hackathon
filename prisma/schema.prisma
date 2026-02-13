@@ -141,6 +141,7 @@ model File {
   name       String
   url        String
   type       String   // "PDF" or "MD"
+  content    String   @default("") // Extracted text for deep search
   groupId    Int      @map("group_id")
   uploadedBy Int      @map("uploaded_by")
   createdAt  DateTime @default(now()) @map("created_at")
