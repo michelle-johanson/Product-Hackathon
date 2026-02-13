@@ -6,93 +6,34 @@ const authMiddleware = require('../middleware/auth');
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Initialize Google Generative AI with better error handling
+// Initialize Google Generative AI
 let model;
 let apiKeyValid = false;
 try {
   const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
   if (!apiKey) {
-    console.error('❌ GOOGLE_GEMINI_API_KEY is not set in .env');
+    console.error('GOOGLE_GEMINI_API_KEY is not set in .env');
   } else {
-    console.log('✅ Google Gemini API Key loaded');
+    console.log('Google Gemini API Key loaded');
     const genAI = new GoogleGenerativeAI(apiKey);
     model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     apiKeyValid = true;
   }
 } catch (err) {
-  console.error('❌ Error initializing Google Generative AI:', err.message);
+  console.error('Error initializing Google Generative AI:', err.message);
 }
 
 // Demo response generator (for when API is unavailable)
-function generateDemoResponse(question, noteContent, fileContents) {
-  const relevantContent = [];
-
-  // Find relevant content
-  if (noteContent && noteContent.toLowerCase().includes(question.toLowerCase().split(' ')[0])) {
-    relevantContent.push('Group Notes');
-  }
-  fileContents.forEach(f => {
-    if (f.content.toLowerCase().includes(question.toLowerCase().split(' ')[0])) {
-      relevantContent.push(`File: ${f.name}`);
-    }
-  });
-
-  // Generate contextual demo response
-  const demoResponses = {
-    'what': 'Based on the class materials provided, this is a comprehensive answer synthesizing information from your notes and uploaded files. The AI uses your learning context to provide specific, relevant information tailored to your coursework.',
-    'how': 'The process involves several key steps outlined in your class materials. Your notes and files contain detailed explanations that the AI integrates to provide you with a complete understanding of the topic.',
-    'why': 'Understanding the reasoning behind concepts is crucial. According to your class materials, this happens because of the fundamental principles taught in your course.',
-    'when': 'The timing and context are important here. As referenced in your notes, this typically occurs during specific circumstances relevant to your studies.',
-    'which': 'There are several options to consider based on your materials. Each option has distinct characteristics explained in your uploaded resources.',
-    'default': 'Based on your class notes and materials, here\'s a detailed explanation: The concepts you\'re asking about are thoroughly covered in your uploaded files. This response synthesizes that information with relevant context from your course.'
-  };
-
-  const firstWord = question.split(' ')[0].toLowerCase();
-  const response = demoResponses[firstWord] || demoResponses['default'];
-
+function generateDemoResponse(question) {
   return {
-    answer: response,
-    sources: relevantContent.length > 0 ? relevantContent : ['General Knowledge'],
+    answer: 'Demo Mode: The AI chatbot is not connected. Please add a valid GOOGLE_GEMINI_API_KEY to your .env file to enable real responses.',
+    sources: ['Demo Mode'],
     isDemoMode: true
   };
 }
 
-// Helper: Search for relevant content using simple keyword matching
-function findRelevantContent(question, noteContent, fileContents) {
-  const questionWords = question.toLowerCase().split(/\s+/).filter(w => w.length > 3);
-
-  let results = [];
-
-  // Search in notes
-  if (noteContent) {
-    const noteMatches = questionWords.filter(word => noteContent.toLowerCase().includes(word)).length;
-    if (noteMatches > 0) {
-      results.push({
-        type: 'note',
-        content: noteContent,
-        relevanceScore: noteMatches,
-        source: 'Group Notes'
-      });
-    }
-  }
-
-  // Search in files
-  fileContents.forEach(file => {
-    const fileMatches = questionWords.filter(word => file.content.toLowerCase().includes(word)).length;
-    if (fileMatches > 0) {
-      results.push({
-        type: 'file',
-        content: file.content,
-        relevanceScore: fileMatches,
-        source: `File: ${file.name}`
-      });
-    }
-  });
-
-  // Sort by relevance and limit to top 3 to stay under token limits
-  results.sort((a, b) => b.relevanceScore - a.relevanceScore);
-  return results.slice(0, 3);
-}
+// Max characters of context to send to the model
+const MAX_CONTEXT_LENGTH = 30000;
 
 router.post('/', authMiddleware, async (req, res) => {
   try {
@@ -111,39 +52,64 @@ router.post('/', authMiddleware, async (req, res) => {
       return res.status(403).json({ error: 'Not a member of this group' });
     }
 
-    // Fetch group notes
+    // Fetch ALL group notes
     const note = await prisma.note.findFirst({
       where: { groupId: parseInt(groupId) }
     });
 
-    // Fetch group files
+    // Fetch ALL group files with their extracted text content
     const files = await prisma.file.findMany({
       where: { groupId: parseInt(groupId) },
-      select: { name: true, content: true }
+      select: { name: true, content: true, type: true }
     });
 
-    // Find relevant content
-    const relevantContent = findRelevantContent(
-      question,
-      note?.content || '',
-      files
-    );
-
-    // Build context for AI
-    let context = 'Use the following class materials to answer the question:\n\n';
+    // Build context from all available materials
+    let context = '';
     let sources = [];
+    let totalLength = 0;
 
-    relevantContent.forEach((item) => {
-      sources.push(item.source);
-      context += `[Source: ${item.source}]\n`;
-      context += item.content.substring(0, 1500) + '\n\n'; // Limit each source to 1500 chars
-    });
-
-    if (relevantContent.length === 0) {
-      context += 'Note: No specific materials found matching this question, answering based on general knowledge.\n\n';
+    // Add notes content
+    if (note?.content && note.content.trim()) {
+      const noteText = note.content.substring(0, 5000);
+      context += `[Source: Group Notes]\n${noteText}\n\n`;
+      sources.push('Group Notes');
+      totalLength += noteText.length;
     }
 
-    context += `Question: ${question}`;
+    // Add all file contents, distributing space evenly
+    const filesWithContent = files.filter(f => f.content && f.content.trim());
+    if (filesWithContent.length > 0) {
+      const remainingSpace = MAX_CONTEXT_LENGTH - totalLength;
+      const perFileLimit = Math.floor(remainingSpace / filesWithContent.length);
+
+      for (const file of filesWithContent) {
+        const fileText = file.content.substring(0, Math.max(perFileLimit, 1000));
+        context += `[Source: ${file.name}]\n${fileText}\n\n`;
+        sources.push(file.name);
+        totalLength += fileText.length;
+        if (totalLength >= MAX_CONTEXT_LENGTH) break;
+      }
+    }
+
+    // Build the full prompt with system instructions
+    const systemPrompt = `You are "Jerry the Driver", a helpful and friendly AI study assistant for a collaborative study group app called Struggle Bus.
+Your job is to help students understand their class materials by answering questions based on the provided context.
+
+Rules:
+- Answer questions using the provided class materials (notes and files) as your primary source.
+- If the materials contain relevant information, reference which source it came from.
+- If the materials don't cover the question, say so and provide a general answer based on your knowledge.
+- Keep answers clear, concise, and student-friendly.
+- Use markdown formatting for readability (headers, bullet points, code blocks, etc.).
+
+`;
+
+    let fullPrompt;
+    if (context.trim()) {
+      fullPrompt = systemPrompt + `Here are the group's class materials:\n\n${context}\n\nStudent question: ${question}`;
+    } else {
+      fullPrompt = systemPrompt + `No class materials have been uploaded to this group yet.\n\nStudent question: ${question}`;
+    }
 
     // Call Google Gemini API with fallback to demo mode
     let aiResponse;
@@ -151,21 +117,17 @@ router.post('/', authMiddleware, async (req, res) => {
 
     try {
       if (model && apiKeyValid) {
-        const result = await model.generateContent(context);
+        const result = await model.generateContent(fullPrompt);
         aiResponse = result.response.text();
-        console.log('✅ Using real Gemini API response');
       } else {
         throw new Error('Model not initialized');
       }
     } catch (apiErr) {
-      console.warn('⚠️ Gemini API unavailable, falling back to demo mode:', apiErr.message);
+      console.warn('Gemini API unavailable, falling back to demo mode:', apiErr.message);
       demoMode = true;
-
-      // Generate demo response
-      const demoData = generateDemoResponse(question, note?.content || '', files);
+      const demoData = generateDemoResponse(question);
       aiResponse = demoData.answer;
       sources = demoData.sources;
-      console.log('✅ Using demo mode response');
     }
 
     return res.json({
@@ -176,7 +138,7 @@ router.post('/', authMiddleware, async (req, res) => {
     });
 
   } catch (err) {
-    console.error('❌ Error in chat route:', err);
+    console.error('Error in chat route:', err);
     return res.status(500).json({
       error: 'Failed to process question',
       details: err.message
