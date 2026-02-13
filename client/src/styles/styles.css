@@ -1,7 +1,8 @@
 /* ============================================
-   STYLES.CSS - Global Foundation
+   STYLES.CSS - Global Foundation & Misc
    ============================================ */
 
+/* ===== 1. GLOBAL RESET ===== */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -26,6 +27,7 @@ body {
   overflow: hidden;
 }
 
+/* ===== 2. LAYOUT CONTENT ===== */
 .layout-main {
   flex: 1;
   display: flex;
@@ -38,8 +40,10 @@ body {
   flex: 1;
   height: 100%;
   overflow-y: auto;
+  width: 100%; 
 }
 
+/* ===== 3. TAB NAVIGATION ===== */
 .tab-navigation-wrapper {
   background-color: var(--color-tab-pill-bg);
   padding: 5px;
@@ -66,6 +70,7 @@ body {
   color: #000;
 }
 
+/* ===== 4. GENERIC BUTTONS ===== */
 .btn-action-yellow {
   background-color: var(--color-auth-btn-yellow);
   border: none;
@@ -76,7 +81,7 @@ body {
   cursor: pointer;
 }
 
-/* AI Placeholder Overlay */
+/* ===== 5. AI PLACEHOLDER ===== */
 .ai-placeholder-overlay {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -93,4 +98,310 @@ body {
   border-radius: 20px;
   color: white;
   backdrop-filter: blur(5px);
+}
+
+/* ===== 6. ACCOUNT SETTINGS ===== */
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 80px 20px;
+  width: 100%;
+  animation: fadeIn 0.3s ease;
+}
+
+.settings-heading {
+  font-family: var(--font-main);
+  font-size: 2.2rem;
+  font-weight: 400;
+  margin-bottom: 40px;
+  color: #000;
+  text-align: center;
+}
+
+.settings-card {
+  background-color: #d9d9d9;
+  border-radius: 30px;
+  padding: 40px 50px;
+  width: 100%;
+  max-width: 550px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  text-align: left;
+  margin-bottom: 40px;
+  align-self: center; 
+}
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-label {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #000;
+  margin-bottom: 5px;
+}
+
+.settings-value {
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.settings-divider {
+  width: 100%;
+  max-width: 600px;
+  border: none;
+  border-top: 2px dashed #999;
+  margin-bottom: 40px;
+}
+
+.settings-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 320px;
+  align-items: center;
+}
+
+.settings-btn {
+  width: 100%;
+  margin-right: 0;
+  font-size: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-action-danger {
+  background-color: #ffe8e8;
+  color: #c0392b;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: transform 0.1s, background-color 0.2s;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  width: 100%;
+}
+
+.btn-action-danger:hover {
+  background-color: #ffd1d1;
+  transform: translateY(-1px);
+}
+
+.btn-action-danger:active {
+  transform: translateY(1px);
+}
+
+/* ===== 7. GROUP MANAGEMENT (CREATE/JOIN) - MATCHING FIGMA ===== */
+.group-mgmt-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px;
+  width: 100%;
+  animation: fadeIn 0.3s ease;
+}
+
+.mgmt-section {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+}
+
+.mgmt-heading {
+  font-family: var(--font-main);
+  font-size: 2.5rem;
+  font-weight: 400;
+  color: #000;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.mgmt-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+.mgmt-input {
+  width: 100%;
+  height: 60px;
+  background-color: #d9d9d9; /* The Figma grey */
+  border: none;
+  border-radius: 30px;
+  padding: 0 30px;
+  font-size: 1.1rem;
+  color: #333;
+  outline: none;
+  transition: background-color 0.2s;
+}
+
+.mgmt-input:focus {
+  background-color: #e6e6e6;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.mgmt-submit-btn {
+  background-color: #fcd34d; /* The Figma yellow */
+  border: none;
+  padding: 15px 60px;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: transform 0.1s, opacity 0.2s;
+  color: #333;
+  margin-top: 10px;
+  width: auto;
+  min-width: 200px;
+}
+
+.mgmt-submit-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.mgmt-submit-btn:active {
+  transform: translateY(1px);
+}
+
+.mgmt-divider {
+  width: 100%;
+  max-width: 700px;
+  border: none;
+  border-top: 2px dashed #555;
+  margin: 60px 0;
+  opacity: 0.6;
+}
+
+/* ===== 8. WELCOME DASHBOARD ===== */
+.dashboard-container {
+  padding: 60px 40px;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+  animation: fadeIn 0.4s ease;
+}
+
+.welcome-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.welcome-title {
+  font-family: var(--font-heading-serif);
+  font-size: 3rem;
+  margin-bottom: 10px;
+  color: #000;
+}
+
+.welcome-subtitle {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+/* Dashboard Grid Layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* Main content vs Side widget */
+  gap: 30px;
+  align-items: start;
+}
+
+/* Empty State Card */
+.instruction-card {
+  background-color: #ffffff;
+  border-radius: 24px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.05);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+/* NEW: Logo styling for the dashboard card */
+.instruction-logo {
+  width: 100%;           /* Fill container width up to max-width */
+  max-width: 400px;      /* Prevent it from getting too huge */
+  height: 200px;         /* Fixed height to force cropping */
+  object-fit: cover;     /* Ensures image fills the box without stretching */
+  object-position: center;  /* Anchors image to top, cropping the bottom */
+  border-radius: 12px;   /* Optional: rounded corners for the image itself */
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+  transition: transform 0.3s ease;
+}
+
+.instruction-logo:hover {
+  transform: scale(1.02);
+}
+
+/* Calendar Widget Styling */
+.calendar-widget {
+  background-color: #ffffff;
+  border-radius: 24px;
+  padding: 25px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.calendar-header {
+  font-family: var(--font-heading-serif);
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  border-bottom: 2px dashed #eee;
+  padding-bottom: 10px;
+  text-align: center;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  text-align: center;
+}
+
+.cal-day-name {
+  font-weight: bold;
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 10px;
+}
+
+.cal-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  color: #333;
+  cursor: default;
+}
+
+.cal-day.today {
+  background-color: var(--color-auth-btn-yellow);
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+.cal-day.faded {
+  opacity: 0.3;
 }
