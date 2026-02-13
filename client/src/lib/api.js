@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:3000/api";
+const API_BASE = "product-hackathon-production.up.railway.app";
 
 export async function apiRequest(endpoint, options = {}) {
   const token = localStorage.getItem("token");
