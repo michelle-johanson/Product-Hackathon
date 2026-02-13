@@ -4,6 +4,7 @@ const http = require('http');
 const { WebSocketServer } = require('ws');
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
+require('dotenv').config();
 
 const path = require('path');
 const authRoutes = require('./routes/auth');
@@ -11,6 +12,7 @@ const groupRoutes = require('./routes/groups');
 const messageRoutes = require('./routes/messages');
 const noteRoutes = require('./routes/notes');
 const fileRoutes = require('./routes/files');
+const chatRoutes = require('./routes/chat');
 
 const app = express();
 const prisma = new PrismaClient();
@@ -31,6 +33,7 @@ app.use('/api/groups', groupRoutes);
 app.use('/api', messageRoutes);
 app.use('/api/notes', noteRoutes);
 app.use('/api/files', fileRoutes);
+app.use('/api/chat', chatRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 function verifyToken(token) {
