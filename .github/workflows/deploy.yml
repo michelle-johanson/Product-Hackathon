@@ -1,0 +1,22 @@
+name: Deploy Frontend
+on:
+  push:
+    branches: [main] # or master
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install and Build
+        run: |
+          cd client
+          npm install
+          npm run build
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: client/dist # This tells it exactly where the files are!
+          branch: gh-pages # This creates a new branch just for the website
