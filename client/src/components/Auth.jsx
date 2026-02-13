@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { apiRequest } from "./lib/api";
+import { apiRequest } from "../lib/api"; // Note: changed path to ../lib/api based on your folder structure
 
 export default function Auth({ onLogin }) {
   const [isSignup, setIsSignup] = useState(false);
@@ -10,7 +10,7 @@ export default function Auth({ onLogin }) {
   const [password, setPassword] = useState("");
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // CRITICAL: Prevents the page from reloading!
+    e.preventDefault();
     setError("");
 
     try {
@@ -24,10 +24,7 @@ export default function Auth({ onLogin }) {
         body: JSON.stringify(payload),
       });
 
-      // Store token
       localStorage.setItem("token", data.token);
-      
-      // Tell App.jsx we are done
       onLogin(data.user);
 
     } catch (err) {
@@ -36,22 +33,27 @@ export default function Auth({ onLogin }) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-200">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">
-          {isSignup ? "Create Account" : "Welcome Back"}
+    <div className="auth-container">
+      <div className="auth-card">
+        {/* LOGO SECTION - Corrected filename */}
+        <div className="logo-wrapper">
+          <img 
+            src="/StruggleBusLogo.png" 
+            alt="Struggle Bus" 
+            className="auth-logo" 
+          />
+        </div>
+
+        <h1 className="auth-heading">
+          {isSignup ? "Create Account" : "Login"}
         </h1>
 
-        {error && (
-          <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm border border-red-300">
-            {error}
-          </div>
-        )}
+        {error && <div className="auth-error-box">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="auth-form">
           {isSignup && (
             <input
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="auth-input"
               placeholder="Full Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -60,8 +62,8 @@ export default function Auth({ onLogin }) {
           )}
 
           <input
-            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Email Address"
+            className="auth-input"
+            placeholder="Enter Email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -69,7 +71,7 @@ export default function Auth({ onLogin }) {
           />
 
           <input
-            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="auth-input"
             type="password"
             placeholder="Password"
             value={password}
@@ -77,19 +79,16 @@ export default function Auth({ onLogin }) {
             required
           />
 
-          <button 
-            className="w-full bg-blue-600 text-white font-bold py-3 rounded hover:bg-blue-700 transition"
-            type="submit"
-          >
-            {isSignup ? "Sign Up" : "Log In"}
+          <button className="auth-submit-btn" type="submit">
+            {isSignup ? "Sign up" : "Sign in"}
           </button>
         </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-gray-600 text-sm">
-            {isSignup ? "Already have an account?" : "Need an account?"}{" "}
+        <div className="auth-toggle">
+          <p>
+            {isSignup ? "Already have an account?" : "Need an account?"}
             <button 
-              className="text-blue-600 font-semibold hover:underline"
+              className="auth-toggle-btn"
               onClick={() => {
                 setIsSignup(!isSignup);
                 setError("");
