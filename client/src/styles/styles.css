@@ -286,3 +286,122 @@ body {
   margin: 60px 0;
   opacity: 0.6;
 }
+
+/* ===== 8. WELCOME DASHBOARD ===== */
+.dashboard-container {
+  padding: 60px 40px;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+  animation: fadeIn 0.4s ease;
+}
+
+.welcome-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.welcome-title {
+  font-family: var(--font-heading-serif);
+  font-size: 3rem;
+  margin-bottom: 10px;
+  color: #000;
+}
+
+.welcome-subtitle {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+/* Dashboard Grid Layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* Main content vs Side widget */
+  gap: 30px;
+  align-items: start;
+}
+
+/* Empty State Card */
+.instruction-card {
+  background-color: #ffffff;
+  border-radius: 24px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.05);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+/* NEW: Logo styling for the dashboard card */
+.instruction-logo {
+  width: 100%;           /* Fill container width up to max-width */
+  max-width: 400px;      /* Prevent it from getting too huge */
+  height: 200px;         /* Fixed height to force cropping */
+  object-fit: cover;     /* Ensures image fills the box without stretching */
+  object-position: center;  /* Anchors image to top, cropping the bottom */
+  border-radius: 12px;   /* Optional: rounded corners for the image itself */
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+  transition: transform 0.3s ease;
+}
+
+.instruction-logo:hover {
+  transform: scale(1.02);
+}
+
+/* Calendar Widget Styling */
+.calendar-widget {
+  background-color: #ffffff;
+  border-radius: 24px;
+  padding: 25px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.calendar-header {
+  font-family: var(--font-heading-serif);
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  border-bottom: 2px dashed #eee;
+  padding-bottom: 10px;
+  text-align: center;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  text-align: center;
+}
+
+.cal-day-name {
+  font-weight: bold;
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 10px;
+}
+
+.cal-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  color: #333;
+  cursor: default;
+}
+
+.cal-day.today {
+  background-color: var(--color-auth-btn-yellow);
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+.cal-day.faded {
+  opacity: 0.3;
+}

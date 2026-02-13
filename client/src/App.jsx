@@ -7,6 +7,35 @@ import busIcon from './assets/bus_icon.svg';
 import accountIcon from './assets/account_icon.svg';
 import addIcon from './assets/add_icon.svg';
 
+// --- Simple Calendar Component ---
+const CalendarWidget = () => {
+  const date = new Date();
+  const currentDay = date.getDate();
+  const monthName = date.toLocaleString('default', { month: 'long' });
+  const year = date.getFullYear();
+
+  const days = Array.from({ length: 30 }, (_, i) => i + 1);
+
+  return (
+    <div className="calendar-widget">
+      <div className="calendar-header">{monthName} {year}</div>
+      <div className="calendar-grid">
+        {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
+          <div key={i} className="cal-day-name">{d}</div>
+        ))}
+        <div className="cal-day"></div>
+        <div className="cal-day"></div>
+        
+        {days.map(d => (
+          <div key={d} className={`cal-day ${d === currentDay ? 'today' : ''}`}>
+            {d}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // --- Management View ---
 const GroupManagement = ({ 
   groupName, setGroupName, className, setClassName, handleCreateGroup,
@@ -58,7 +87,7 @@ const GroupManagement = ({
   );
 };
 
-// --- Updated Layout Component ---
+// --- Layout Component ---
 const Layout = ({ children, user, groups, currentGroup, onSelectGroup, onNavigateMgmt, onNavigateSettings }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
@@ -110,7 +139,6 @@ const Layout = ({ children, user, groups, currentGroup, onSelectGroup, onNavigat
   );
 };
 
-// --- Updated Account Settings Component ---
 const AccountSettings = ({ user, onLogout, onDeleteAccount }) => {
   return (
     <div className="settings-container">
@@ -249,7 +277,6 @@ export default function App() {
 
   const handleDeleteAccount = () => {
     if(confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-      // Placeholder for future backend implementation
       alert("Account deletion will be available soon.");
     }
   };
@@ -279,9 +306,36 @@ export default function App() {
         ) : currentGroup ? (
           <GroupPage group={currentGroup} socket={socket} user={user} refreshGroups={fetchGroups} />
         ) : (
-          <div style={{ padding: '60px', textAlign: 'center' }}>
-            <h1 className="mgmt-heading">Welcome, {user.name}</h1>
-            <p style={{ color: '#666', fontSize: '1.1rem' }}>Select a group from the sidebar or click the <span style={{color: 'var(--color-primary)'}}>+</span> icon to get started.</p>
+          <div className="dashboard-container">
+            <div className="welcome-header">
+              <h1 className="welcome-title">Welcome, {user.name}</h1>
+              <p className="welcome-subtitle">Ready to hit the books? Select a group to start studying.</p>
+            </div>
+
+            <div className="dashboard-grid">
+              {/* UPDATED: Left Column now uses the Logo */}
+              <div className="instruction-card">
+                <img 
+                  src={struggleBusLogo} 
+                  alt="Struggle Bus" 
+                  className="instruction-logo" 
+                />
+                <h3>Get Started</h3>
+                <p style={{color: '#666', marginTop: '10px'}}>
+                  Select a group from the sidebar<br/>or use the <b>+</b> button to create one.
+                </p>
+              </div>
+
+              {/* Right Column: Visual Calendar */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <CalendarWidget />
+                
+                <div className="calendar-widget" style={{ textAlign: 'center', padding: '30px' }}>
+                  <div style={{ fontSize: '2.5rem', fontWeight: 'bold' }}>{groups.length}</div>
+                  <div style={{ color: '#666' }}>Active Groups</div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </Layout>
