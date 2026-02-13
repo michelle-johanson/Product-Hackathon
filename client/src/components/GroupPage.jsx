@@ -144,7 +144,7 @@ export default function GroupPage({ group, onBack, socket, user, refreshGroups }
           {chatMode === 'group' ? (
              <ChatComponent groupId={group.id} socket={socket} user={user} />
           ) : (
-             <AiChatComponent />
+            <AiChatComponent groupId={group.id} user={user} />
           )}
         </div>
       </div>
