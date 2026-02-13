@@ -84,6 +84,50 @@ router.post('/backfill/content', auth, async (req, res) => {
   }
 });
 
+// POST /api/files/from-notes/:groupId - Save shared notes as a context file
+router.post('/from-notes/:groupId', auth, async (req, res) => {
+  try {
+    const { groupId } = req.params;
+    const { content, fileName } = req.body;
+
+    if (!content) {
+      return res.status(400).json({ error: 'No content to save' });
+    }
+
+    // Generate filename
+    let finalFilename;
+    if (fileName && fileName.trim()) {
+      finalFilename = path.basename(fileName.trim()); // Sanitize
+      if (!finalFilename.toLowerCase().endsWith('.md')) finalFilename += '.md';
+    } else {
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      finalFilename = `Notes-Context-${timestamp}.md`;
+    }
+
+    const filePath = path.join(uploadDir, finalFilename);
+
+    // Write to disk
+    fs.writeFileSync(filePath, content);
+
+    // Save to DB
+    const newFile = await prisma.file.create({
+      data: {
+        name: finalFilename,
+        url: finalFilename,
+        type: 'MD',
+        content,
+        groupId: parseInt(groupId),
+        uploadedBy: req.user?.id
+      }
+    });
+
+    res.status(201).json(newFile);
+  } catch (error) {
+    console.error('Error saving context file:', error);
+    res.status(500).json({ error: 'Failed to save context file' });
+  }
+});
+
 // GET /api/files/:groupId - List files (supports ?search= deep search)
 router.get('/:groupId', auth, async (req, res) => {
   try {

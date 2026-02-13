@@ -14,6 +14,7 @@ export default function GroupPage({ group, onBack, socket, user, refreshGroups }
   const [editClassName, setEditClassName] = useState('');
   const [sidebarWidth, setSidebarWidth] = useState(350);
   const [isResizing, setIsResizing] = useState(false);
+  const [fileRefreshKey, setFileRefreshKey] = useState(0);
 
   const startResizing = () => {
     setIsResizing(true);
@@ -214,11 +215,11 @@ export default function GroupPage({ group, onBack, socket, user, refreshGroups }
         )}
 
         {currentTab === 'notes' && (
-          <SharedNotes groupId={group.id} socket={socket} />
+          <SharedNotes groupId={group.id} socket={socket} refreshFiles={() => setFileRefreshKey(k => k + 1)} />
         )}
 
         {currentTab === 'files' && (
-          <FileSection groupId={group.id} />
+          <FileSection key={fileRefreshKey} groupId={group.id} />
         )}
       </div>
 

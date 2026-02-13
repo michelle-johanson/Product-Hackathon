@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 
-export default function SharedNotes({ groupId, socket }) {
+export default function SharedNotes({ groupId, socket, refreshFiles }) {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState('All changes saved');
+  const [showModal, setShowModal] = useState(false);
+  const [fileName, setFileName] = useState('');
 
   useEffect(() => {
     // 1. Fetch initial content from DB
@@ -38,6 +40,16 @@ export default function SharedNotes({ groupId, socket }) {
     return () => socket.removeEventListener('message', handleWsMessage);
   }, [socket, groupId]);
 
+  // 3. Autosave Logic (Debounce 2s)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (content) {
+        handleAutosave();
+      }
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [content]);
+
   const handleChange = (e) => {
     const newContent = e.target.value;
     setContent(newContent);
@@ -53,12 +65,10 @@ export default function SharedNotes({ groupId, socket }) {
     }
   };
 
-  // 2. Manual Save to Database
-  const handleSave = async () => {
-    setSaveStatus('Saving...');
+  // Internal Autosave
+  const handleAutosave = async () => {
     const token = localStorage.getItem('token');
     try {
-      // Re-using your sister's route logic pattern from messages.js
       const res = await fetch(`http://localhost:3000/api/notes/${groupId}`, {
         method: 'POST',
         headers: { 
@@ -69,7 +79,49 @@ export default function SharedNotes({ groupId, socket }) {
       });
 
       if (res.ok) {
-        setSaveStatus('All changes saved');
+        const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        setSaveStatus(`Autosaved at ${time}`);
+      }
+    } catch (err) {
+      console.error("Autosave failed", err);
+    }
+  };
+
+  const openSaveModal = () => {
+    if (!content.trim()) return;
+    const dateStr = new Date().toISOString().split('T')[0];
+    setFileName(`Notes-${dateStr}`);
+    setShowModal(true);
+  };
+
+  // "Save as Context" Workflow
+  const handleSaveAsContext = async () => {
+    setShowModal(false);
+    setSaveStatus('Saving as context...');
+    const token = localStorage.getItem('token');
+    try {
+      const res = await fetch(`http://localhost:3000/api/files/from-notes/${groupId}`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({ content, fileName })
+      });
+
+      if (res.ok) {
+        setContent(''); // Clear notes
+        if (refreshFiles) refreshFiles(); // Refresh file list
+        setSaveStatus('Saved as context & cleared');
+        
+        // Broadcast clear to other users
+        if (socket?.readyState === 1) {
+          socket.send(JSON.stringify({
+            type: 'note_update',
+            groupId: parseInt(groupId),
+            content: ''
+          }));
+        }
       } else {
         setSaveStatus('Error saving');
       }
@@ -85,11 +137,11 @@ export default function SharedNotes({ groupId, socket }) {
       <div className="notes-header">
         <h3 className="notes-title">📝 Shared Study Notes</h3>
         <div className="notes-controls">
-          <span className={`save-status ${saveStatus === 'All changes saved' ? 'saved' : 'unsaved'}`}>
+          <span className={`save-status ${saveStatus.includes('Autosaved') ? 'autosaved' : saveStatus === 'All changes saved' ? 'saved' : 'unsaved'}`}>
             {saveStatus}
           </span>
-          <button onClick={handleSave} className="btn-save">
-            Save Now
+          <button onClick={openSaveModal} className="btn-save-context">
+            Save as Context
           </button>
         </div>
       </div>
@@ -100,6 +152,26 @@ export default function SharedNotes({ groupId, socket }) {
         placeholder="Start typing your group notes here..."
         className="notes-textarea"
       />
+
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: '400px', height: 'auto' }}>
+            <h3 className="modal-title">Name your file</h3>
+            <input
+              type="text"
+              className="form-input"
+              value={fileName}
+              onChange={(e) => setFileName(e.target.value)}
+              placeholder="Enter file name..."
+              autoFocus
+            />
+            <div style={{ display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'flex-end' }}>
+              <button className="btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
+              <button className="btn-primary" onClick={handleSaveAsContext}>Save</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

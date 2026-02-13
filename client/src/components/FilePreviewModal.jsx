@@ -21,8 +21,15 @@ export default function FilePreviewModal({ file, onClose }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content modal-wide" onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close-btn" onClick={onClose}>&times;</button>
-        <h3 className="modal-title">{file.name}</h3>
+        <div className="preview-header">
+          <h3 className="modal-title">{file.name}</h3>
+          <div className="preview-header-actions">
+            <a href={fileUrl} target="_blank" rel="noreferrer" className="btn-file-action btn-download" download>
+              Download
+            </a>
+            <button className="modal-close-btn-inline" onClick={onClose}>&times;</button>
+          </div>
+        </div>
 
         <div className="preview-body">
           {file.type === 'PDF' ? (
