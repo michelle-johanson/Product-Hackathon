@@ -1,0 +1,111 @@
+/* ============================================
+   GROUP.CSS - Layout for the Group Page
+   ============================================ */
+
+.group-page-layout {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Prevents text highlighting while dragging */
+.group-page-layout.resizing {
+  user-select: none;
+  cursor: col-resize;
+}
+
+/* --- MAIN CONTENT CENTERING --- */
+.main-content-area {
+  flex: 1; /* Occupies available space */
+  background-color: #ffffff;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.main-content-inner {
+  width: 100%;
+  max-width: 800px;
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+}
+
+.group-title {
+  font-family: var(--font-heading-serif);
+  font-size: 3.5rem;
+  margin-bottom: 5px;
+  color: #000;
+}
+
+.group-subtitle {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 40px;
+}
+
+/* --- THE BUS (Member Card) --- */
+.bus-card {
+  background-color: #f0f0eb;
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e0e0d5;
+  margin-bottom: 40px;
+  width: 100%;
+}
+
+.member-pill {
+  background-color: #ffffff;
+  padding: 14px 28px;
+  border-radius: 30px;
+  font-weight: 600;
+  color: #444;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  margin-bottom: 12px;
+}
+
+/* --- RIGHT PANEL --- */
+.right-chat-panel {
+  background-color: #5e6472;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0; /* Prevents being squashed */
+  position: relative;
+  min-width: 250px;
+  max-width: 70%;
+}
+
+.chat-panel-header {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  background-color: rgba(0,0,0,0.1);
+  min-height: 85px;
+}
+
+.chat-panel-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0 20px 20px 20px;
+}
+
+/* --- RESIZER HANDLE --- */
+.resizer-handle {
+  width: 8px;
+  cursor: col-resize;
+  background-color: rgba(0,0,0,0.1);
+  transition: background 0.2s;
+  z-index: 10;
+  height: 100%;
+}
+
+.resizer-handle:hover, 
+.resizer-handle:active {
+  background-color: var(--color-auth-btn-yellow);
+}
