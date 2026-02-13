@@ -25,7 +25,13 @@ const wss = new WebSocketServer({ server });
 const userConnections = new Map();
 const groupRooms = new Map();
 
-app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(cors({ 
+  origin: [
+    'https://michelle-johanson.github.io', // Your live website
+    'http://localhost:5173'               // Keep this so you can still work locally
+  ],
+  credentials: true
+}));
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
